@@ -4,172 +4,26 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.lone</groupId>
-    <artifactId>itemsadder-blocks-injector</artifactId>
-    <version>0.0.2</version>
-    <packaging>jar</packaging>
-
-    <name>ItemsAdderBlocksInjector</name>
-
     <properties>
-        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <plugins_folder>C:/Progetti/Minecraft/TestServer/1.18/plugins</plugins_folder>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>
+        <plugins_folder>C:/Progetti/Minecraft/TestServer/1.18/plugins</plugins_folder>
     </properties>
 
+    <groupId>dev.lone</groupId>
+    <artifactId>itemsadder-blocks-injector</artifactId>
+    <version>LATEST_VER</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>nms_v1_18_R2</module>
+        <module>nms_legacy</module>
+        <module>itemsadder-blocks-injector-core</module>
+        <module>itemsadder-blocks-injector-jar</module>
+    </modules>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <finalName>ItemsAdderBlocksInjector</finalName><!-- Jar file name is the parent module name -->
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-jar-with-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${plugins_folder}</outputDirectory>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>net.md-5</groupId>
-                <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>remap</goal>
-                        </goals>
-                        <id>remap-obf</id>
-                        <configuration>
-                            <srgIn>org.spigotmc:minecraft-server:1.18.2-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
-                            <reverse>true</reverse>
-                            <remappedDependencies>org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
-                            <remappedArtifactAttached>true</remappedArtifactAttached>
-                            <remappedClassifierName>remapped-obf</remappedClassifierName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>remap</goal>
-                        </goals>
-                        <id>remap-spigot</id>
-                        <configuration>
-                            <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-                            <srgIn>org.spigotmc:minecraft-server:1.18.2-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
-                            <remappedDependencies>org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
+    <name>ItemsAdderBlocksInjector</name>
+    <url>matteodev.it</url>
 
-    <repositories>
-        <repository>
-            <id>papermc-repo</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-    </repositories>
-
-    <dependencies>
-
-        <dependency>
-            <groupId>libs</groupId>
-            <artifactId>ViaVersion</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${jars_libs_folder}/ViaVersion-4.1.1.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>libs</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${jars_libs_folder}/ProtocolLib.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
-            <classifier>remapped-mojang</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>libs</groupId>
-            <artifactId>LoneLibs</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${jars_libs_folder}/LoneLibs.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>libs</groupId>
-            <artifactId>ItemsAdder</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${plugins_folder}/ItemsAdder.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>libs</groupId>
-            <artifactId>IRIS</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${plugins_folder}/IRIS-EXPERIMENTAL-USEMASTERBRANCH.jar</systemPath>
-        </dependency>
-    </dependencies>
 </project>

@@ -20,4 +20,9 @@ public class CachedCustomBlockInfo
         this.key = key;
         this.id = id;
     }
+
+    public String getNamespacedId()
+    {
+        return namespace + ":" + id;
+    }
 }

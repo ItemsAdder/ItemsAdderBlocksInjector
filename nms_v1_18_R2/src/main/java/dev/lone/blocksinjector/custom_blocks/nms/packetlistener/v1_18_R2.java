@@ -1,4 +1,4 @@
-package dev.lone.blocksinjector.custom_blocks;
+package dev.lone.blocksinjector.custom_blocks.nms.packetlistener;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -9,6 +9,8 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.types.version.ChunkSectionType1_18;
+import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
+import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.AbstractCustomBlocksManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.Registry;
@@ -26,13 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BlocksPacketsListener extends PacketAdapter
+public class v1_18_R2 extends AbstractPacketListener
 {
     ChunkSectionType1_18 chunkSectionType = new ChunkSectionType1_18(Block.BLOCK_STATE_REGISTRY.size(), Registry.BIOME_SOURCE.size());
 
-    public BlocksPacketsListener(Plugin plugin)
+    public v1_18_R2(Plugin plugin)
     {
-        super(new AdapterParameteters()
+        super(new PacketAdapter.AdapterParameteters()
                       .plugin(plugin)
                       .listenerPriority(ListenerPriority.LOWEST)
                       .optionAsync()
@@ -107,14 +109,14 @@ public class BlocksPacketsListener extends PacketAdapter
                             BlockState blockData = Block.BLOCK_STATE_REGISTRY.byId(section.getFlatBlock(x, y, z));
                             if (blockData != null)
                             {
-                                CachedCustomBlockInfo cachedBlock = CustomBlocksManager.inst.registeredBlocks.get(blockData.getBlock());
+                                CachedCustomBlockInfo cachedBlock = AbstractCustomBlocksManager.inst.get(blockData.getBlock());
                                 if (cachedBlock != null)
                                 {
                                     section.setFlatBlock(
                                             x,
                                             y,
                                             z,
-                                            Block.BLOCK_STATE_REGISTRY.getId(CustomBlocksManager.nmsBlockFromCached(cachedBlock))
+                                            Block.BLOCK_STATE_REGISTRY.getId((BlockState) AbstractCustomBlocksManager.inst.nmsBlockFromCached(cachedBlock))
                                     );
                                     hasCustomBlocks = true;
                                 }
@@ -147,7 +149,7 @@ public class BlocksPacketsListener extends PacketAdapter
                     }
                 });
 
-                CustomBlocksManager.writeByteArrayDataToLevelChunkDataPacket(
+                AbstractCustomBlocksManager.inst.writeByteArrayDataToLevelChunkDataPacket(
                         chunkDataPacket,
                         byteBuf.array()
                 );
@@ -156,11 +158,11 @@ public class BlocksPacketsListener extends PacketAdapter
         else if (e.getPacketType() == PacketType.Play.Server.BLOCK_CHANGE)
         {
             ClientboundBlockUpdatePacket blockUpdate = (ClientboundBlockUpdatePacket) e.getPacket().getHandle();
-            if (CustomBlocksManager.inst.registeredBlocks.containsKey(blockUpdate.blockState.getBlock()))
+            if (AbstractCustomBlocksManager.inst.contains(blockUpdate.blockState.getBlock()))
             {
-                CachedCustomBlockInfo cachedBlock = CustomBlocksManager.inst.registeredBlocks.get(blockUpdate.blockState.getBlock());
+                CachedCustomBlockInfo cachedBlock = AbstractCustomBlocksManager.inst.get(blockUpdate.blockState.getBlock());
                 //blockState field
-                e.getPacket().getModifier().write(1, CustomBlocksManager.nmsBlockFromCached(cachedBlock));
+                e.getPacket().getModifier().write(1, AbstractCustomBlocksManager.inst.nmsBlockFromCached(cachedBlock));
             }
         }
         else if (e.getPacketType() == PacketType.Play.Server.MULTI_BLOCK_CHANGE)
@@ -173,11 +175,11 @@ public class BlocksPacketsListener extends PacketAdapter
             for (int i = 0, changedBlocksLength = blockStates.length; i < changedBlocksLength; i++)
             {
                 BlockState blockState = blockStates[i];
-                CachedCustomBlockInfo cachedBlock = CustomBlocksManager.inst.registeredBlocks.get(blockState.getBlock());
+                CachedCustomBlockInfo cachedBlock = (CachedCustomBlockInfo) AbstractCustomBlocksManager.inst.get(blockState.getBlock());
                 if (cachedBlock != null)
                 {
                     // And add a wrapped block data!
-                    blockStates[i] = CustomBlocksManager.nmsBlockFromCached(cachedBlock);
+                    blockStates[i] = (BlockState) AbstractCustomBlocksManager.inst.nmsBlockFromCached(cachedBlock);
                 }
                 else
                 {
@@ -192,7 +194,7 @@ public class BlocksPacketsListener extends PacketAdapter
         for (int i = 0; i < blockPalette.size(); i++)
         {
             int paletteId = blockPalette.idByIndex(i);
-            if(CustomBlocksManager.inst.registeredBlocks_stateIds.containsKey(paletteId))
+            if(AbstractCustomBlocksManager.inst.contains(paletteId))
                 return false;
         }
 
@@ -203,7 +205,7 @@ public class BlocksPacketsListener extends PacketAdapter
     {
         for (BlockState changedBlock : changedBlocks)
         {
-            if(CustomBlocksManager.inst.registeredBlocks.containsKey(changedBlock.getBlock()))
+            if(AbstractCustomBlocksManager.inst.contains(changedBlock.getBlock()))
                 return false;
         }
         return true;
