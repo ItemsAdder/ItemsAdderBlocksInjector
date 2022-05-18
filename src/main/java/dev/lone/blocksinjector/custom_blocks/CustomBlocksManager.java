@@ -1,9 +1,8 @@
 package dev.lone.blocksinjector.custom_blocks;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.volmit.iris.util.data.B;
 import dev.lone.blocksinjector.Nms;
-import dev.lone.itemsadder.Core.Core;
-import dev.lone.itemsadder.Core.ItemTypes.CustomBlockItem;
 import dev.lone.itemsadder.api.ItemsAdder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -59,7 +58,7 @@ public class CustomBlocksManager
         BUFFER_FIELD.setAccessible(true);
     }
 
-    public HashMap<Block, CustomBlockItem> registeredBlocks = new HashMap<>();
+    public HashMap<Block, CachedCustomBlockInfo> registeredBlocks = new HashMap<>();
     public HashMap<Integer, Block> registeredBlocks_stateIds = new HashMap<>();
     BlocksPacketsListener packet;
     Plugin plugin;
@@ -72,23 +71,11 @@ public class CustomBlocksManager
         inst = this;
     }
 
-    public void loadFromIaApi(Plugin plugin)
-    {
-        load(plugin, new HashSet<>(ItemsAdder.getNamespacedBlocksNamesInConfig()));
-    }
-
-    public void load(Plugin plugin, Set<String> namespacedBlocks)
+    public void load(Plugin plugin, HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks)
     {
         this.plugin = plugin;
 
-        //<editor-fold desc="Shitty">
-        List<CustomBlockItem> customBlocks = new ArrayList<>();
-        for (String s : namespacedBlocks)
-        {
-            customBlocks.add(Core.inst().getOriginalCustomBlockItem(s));
-        }
-        //</editor-fold>
-        injectBlocks(customBlocks);
+        injectBlocks(namespacedBlocks);
 
         if(packet == null)
         {
@@ -119,11 +106,11 @@ public class CustomBlocksManager
         if(storageFolder.exists())
         {
 
-            Set<String> namespacedBlocks = new HashSet<>();
-            namespacedBlocks.addAll(loadCacheFile(storageFolder, "real_blocks_ids_cache"));
-            namespacedBlocks.addAll(loadCacheFile(storageFolder, "real_blocks_note_ids_cache"));
-            namespacedBlocks.addAll(loadCacheFile(storageFolder, "real_transparent_blocks_ids_cache"));
-            namespacedBlocks.addAll(loadCacheFile(storageFolder, "real_wire_ids_cache"));
+            HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks = new HashMap<>();
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_blocks_ids_cache"));
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_blocks_note_ids_cache"));
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_transparent_blocks_ids_cache"));
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_wire_ids_cache"));
 
             load(plugin, namespacedBlocks);
         }
@@ -133,21 +120,29 @@ public class CustomBlocksManager
         }
     }
 
-    private Set<String> loadCacheFile(File storageFolder, String cacheFileName)
+    private HashMap<CachedCustomBlockInfo, Integer> loadCacheFile(File storageFolder, String cacheFileName)
     {
+        HashMap<CachedCustomBlockInfo, Integer> map = new HashMap<>();
         File f = new File(storageFolder, cacheFileName + ".yml");
-        if(!f.exists())
-            return new LinkedHashSet<>();
-
-        FileConfiguration cacheYml = YamlConfiguration.loadConfiguration(f);
-        return cacheYml.getKeys(false);
+        if (f.exists())
+        {
+            FileConfiguration cacheYml = YamlConfiguration.loadConfiguration(f);
+            for (String key : cacheYml.getKeys(false))
+            {
+                int id = cacheYml.getInt(key);
+                map.put(new CachedCustomBlockInfo(key, id), id);
+            }
+        }
+        return map;
     }
 
-    private void injectBlocks(List<CustomBlockItem> customBlocks)
+    private void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks)
     {
+        plugin.getLogger().info("Injecting " + customBlocks.size() + " blocks...");
+
         unfreezeRegistry();
-        for (CustomBlockItem customBlock : customBlocks)
-        {
+        customBlocks.forEach((cached, integer) -> {
+
             Block internalBlock = null;
             try
             {
@@ -156,7 +151,7 @@ public class CustomBlocksManager
                 //<editor-fold desc="Inject the block into the Minecraft internal registry">
                 Registry.register(
                         Registry.BLOCK,
-                        new ResourceLocation(customBlock.namespace, customBlock.id),
+                        new ResourceLocation(cached.namespace, cached.key),
                         internalBlock
                 );
                 internalBlock.getStateDefinition().getPossibleStates().forEach(Block.BLOCK_STATE_REGISTRY::add);
@@ -187,7 +182,7 @@ public class CustomBlocksManager
                 // TODO: recode this shit
                 for (BlockState state : Block.BLOCK_STATE_REGISTRY)
                 {
-                    if (state.getBlock().getDescriptionId().equals("block." + customBlock.namespace + "." + customBlock.id))
+                    if (state.getBlock().getDescriptionId().equals("block." + cached.namespace + "." + cached.key))
                     {
                         internalBlock = state.getBlock();
                         plugin.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
@@ -199,13 +194,20 @@ public class CustomBlocksManager
 
             if(internalBlock != null)
             {
-                registeredBlocks.put(internalBlock, customBlock);
+                registeredBlocks.put(internalBlock, cached);
                 registeredBlocks_stateIds.put(Block.BLOCK_STATE_REGISTRY.getId(internalBlock.defaultBlockState()), internalBlock);
             }
-        }
+
+        });
 
         Blocks.rebuildCache();
         Registry.BLOCK.freeze();
+
+        //TODO: skip if Iris is not installed.
+        // Inject into Iris
+        customBlocks.forEach((cached, integer) -> {
+            B.registerCustomBlockData(cached.namespace, cached.key, Bukkit.createBlockData(cached.namespace + ":" + cached.key));
+        });
 
         plugin.getLogger().info("Finished injecting blocks");
     }
@@ -221,29 +223,30 @@ public class CustomBlocksManager
         try
         {
             Field intrusiveHolderCache = Nms.getField(MappedRegistry.class, Map.class, 5);
-            if (intrusiveHolderCache != null)
-            {
-                intrusiveHolderCache.setAccessible(true);
-                intrusiveHolderCache.set(Registry.BLOCK, new IdentityHashMap<Block, Holder.Reference<Block>>());
-            }
+            intrusiveHolderCache.setAccessible(true);
+            intrusiveHolderCache.set(Registry.BLOCK, new IdentityHashMap<Block, Holder.Reference<Block>>());
 
             Field frozen = Nms.getField(MappedRegistry.class, boolean.class, 0);
-            if (frozen != null)
-            {
-                frozen.setAccessible(true);
-                frozen.set(Registry.BLOCK, false);
-            }
+            frozen.setAccessible(true);
+            frozen.set(Registry.BLOCK, false);
         }
-        catch (SecurityException | IllegalArgumentException | IllegalAccessException e)
+        catch (SecurityException | IllegalArgumentException | IllegalAccessException | NullPointerException e)
         {
             e.printStackTrace();
         }
     }
 
-    public static BlockState nmsBlockStateFromCustomItem(CustomBlockItem customBlockItem)
+    public static BlockState nmsBlockFromCached(CachedCustomBlockInfo cachedBlock)
     {
         //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
-        CraftBlockData bukkitData = (CraftBlockData) Bukkit.createBlockData(customBlockItem.placedBlockModel.getBlockData().getAsString(true));
+        CraftBlockData bukkitData = (CraftBlockData) ItemsAdder.getBlockDataByInternalId(cachedBlock.id);
+        return bukkitData.getState();
+    }
+
+    public static BlockState nmsBlockStateFromBlockNamespacedId(int id)
+    {
+        //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
+        CraftBlockData bukkitData = (CraftBlockData) ItemsAdder.getBlockDataByInternalId(id);
         return bukkitData.getState();
     }
 

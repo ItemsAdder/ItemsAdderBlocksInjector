@@ -151,18 +151,25 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.lone.LoneLibs</groupId>
+            <groupId>libs</groupId>
             <artifactId>LoneLibs</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${jars_libs_folder}/LoneLibs.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>dev.lone.LoneLibs</groupId>
+            <groupId>libs</groupId>
             <artifactId>ItemsAdder</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${plugins_folder}/ItemsAdder.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>libs</groupId>
+            <artifactId>IRIS</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${plugins_folder}/IRIS-EXPERIMENTAL-USEMASTERBRANCH.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

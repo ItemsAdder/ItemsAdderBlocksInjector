@@ -5,12 +5,10 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.types.version.ChunkSectionType1_18;
-import dev.lone.itemsadder.Core.ItemTypes.CustomBlockItem;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.Registry;
@@ -18,7 +16,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.World;
@@ -31,7 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BlocksPacketsListener extends PacketAdapter
 {
-    //TODO: don't use Viaversion, implement this without ChunkSectionType1_18 class!!!
     ChunkSectionType1_18 chunkSectionType = new ChunkSectionType1_18(Block.BLOCK_STATE_REGISTRY.size(), Registry.BIOME_SOURCE.size());
 
     public BlocksPacketsListener(Plugin plugin)
@@ -52,6 +48,8 @@ public class BlocksPacketsListener extends PacketAdapter
     public void onPacketSending(PacketEvent e)
     {
         PacketContainer packet = e.getPacket();
+        // Should I catch not registered blocks (removed from configs) and render them as STONE (for example), to avoid clients crash?
+        // Seems the game automatically removes unknown blocks from the region files.
 
         if (e.getPacketType() == PacketType.Play.Server.MAP_CHUNK)
         {
@@ -109,14 +107,14 @@ public class BlocksPacketsListener extends PacketAdapter
                             BlockState blockData = Block.BLOCK_STATE_REGISTRY.byId(section.getFlatBlock(x, y, z));
                             if (blockData != null)
                             {
-                                CustomBlockItem customBlockItem = CustomBlocksManager.inst.registeredBlocks.get(blockData.getBlock());
-                                if (customBlockItem != null)
+                                CachedCustomBlockInfo cachedBlock = CustomBlocksManager.inst.registeredBlocks.get(blockData.getBlock());
+                                if (cachedBlock != null)
                                 {
                                     section.setFlatBlock(
                                             x,
                                             y,
                                             z,
-                                            Block.BLOCK_STATE_REGISTRY.getId(CustomBlocksManager.nmsBlockStateFromCustomItem(customBlockItem))
+                                            Block.BLOCK_STATE_REGISTRY.getId(CustomBlocksManager.nmsBlockFromCached(cachedBlock))
                                     );
                                     hasCustomBlocks = true;
                                 }
@@ -160,9 +158,9 @@ public class BlocksPacketsListener extends PacketAdapter
             ClientboundBlockUpdatePacket blockUpdate = (ClientboundBlockUpdatePacket) e.getPacket().getHandle();
             if (CustomBlocksManager.inst.registeredBlocks.containsKey(blockUpdate.blockState.getBlock()))
             {
-                CustomBlockItem customBlockItem = CustomBlocksManager.inst.registeredBlocks.get(blockUpdate.blockState.getBlock());
+                CachedCustomBlockInfo cachedBlock = CustomBlocksManager.inst.registeredBlocks.get(blockUpdate.blockState.getBlock());
                 //blockState field
-                e.getPacket().getModifier().write(1, CustomBlocksManager.nmsBlockStateFromCustomItem(customBlockItem));
+                e.getPacket().getModifier().write(1, CustomBlocksManager.nmsBlockFromCached(cachedBlock));
             }
         }
         else if (e.getPacketType() == PacketType.Play.Server.MULTI_BLOCK_CHANGE)
@@ -172,28 +170,24 @@ public class BlocksPacketsListener extends PacketAdapter
             if (containsNoCustomBlock(blockStates))
                 return;
 
-            // If there's any note blocks in this packet...
             for (int i = 0, changedBlocksLength = blockStates.length; i < changedBlocksLength; i++)
             {
                 BlockState blockState = blockStates[i];
-                CustomBlockItem customBlockItem = CustomBlocksManager.inst.registeredBlocks.get(blockState.getBlock());
-                if (customBlockItem != null)
+                CachedCustomBlockInfo cachedBlock = CustomBlocksManager.inst.registeredBlocks.get(blockState.getBlock());
+                if (cachedBlock != null)
                 {
                     // And add a wrapped block data!
-                    blockStates[i] = CustomBlocksManager.nmsBlockStateFromCustomItem(customBlockItem);
+                    blockStates[i] = CustomBlocksManager.nmsBlockFromCached(cachedBlock);
                 }
                 else
                 {
                     blockStates[i] = blockState;
                 }
             }
-
-            // And write the new array to the packet
-            //e.getPacket().getBlockDataArrays().write(0, blockStates);
         }
     }
 
-    private boolean containsNoCustomBlock(DataPalette blockPalette) // TODO: don't use Viaversion "DataPalette"
+    private boolean containsNoCustomBlock(DataPalette blockPalette)
     {
         for (int i = 0; i < blockPalette.size(); i++)
         {

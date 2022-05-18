@@ -11,12 +11,12 @@ public class Nms
         {
             if (field.getType() == type)
             {
-                i++;
                 if(index == i)
                 {
                     field.setAccessible(true);
                     return field;
                 }
+                i++;
             }
         }
         return null;

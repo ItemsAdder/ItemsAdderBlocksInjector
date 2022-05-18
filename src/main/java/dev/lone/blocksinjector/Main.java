@@ -8,6 +8,7 @@ import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
 import net.minecraft.core.BlockPos;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,9 +42,11 @@ public final class Main extends JavaPlugin implements Listener
 
 
     @EventHandler
-    public void iaload(ItemsAdderLoadDataEvent e)
+    public void onItemsAdderLoadData(ItemsAdderLoadDataEvent e)
     {
-        blocksManager.loadFromIaApi(this);
+        if(e.getCause() == ItemsAdderLoadDataEvent.Cause.FIRST_LOAD)
+            return;
+        blocksManager.loadFromCache(this);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -73,8 +76,12 @@ public final class Main extends JavaPlugin implements Listener
             CustomBlockItem originalCustomBlockItem = Core.inst().getOriginalCustomBlockItem(namespacedId);
             if(originalCustomBlockItem != null) // Is a custom injected block
             {
-                originalCustomBlockItem.place(e.getClickedBlock());
-                e.getPlayer().sendMessage("Fixed injected block!");
+                e.setCancelled(true);
+                e.getClickedBlock().setType(Material.AIR, false);
+                Bukkit.getScheduler().runTaskLater(this, () -> {
+                    originalCustomBlockItem.place(e.getClickedBlock());
+                    e.getPlayer().sendMessage("Fixed injected block!");
+                }, 4L);
             }
         }
     }
