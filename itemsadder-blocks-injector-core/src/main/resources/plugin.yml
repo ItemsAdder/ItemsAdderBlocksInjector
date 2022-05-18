@@ -7,6 +7,3 @@ depend:
   - ItemsAdder
   - ViaVersion
   - Iris
-softdepend:
-  - FastAsyncWorldEdit
-  - WorldEdit

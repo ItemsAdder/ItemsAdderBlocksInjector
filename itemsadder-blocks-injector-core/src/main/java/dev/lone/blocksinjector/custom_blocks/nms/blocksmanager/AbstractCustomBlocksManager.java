@@ -3,7 +3,6 @@ package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 import com.comphenix.protocol.ProtocolLibrary;
 import dev.lone.blocksinjector.Nms;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
-
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.AbstractPacketListener;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,6 +14,12 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
+/**
+ * Not compatible with FAWE.
+ * Useful links:
+ * - https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/268d8cff49df810c5d8093aa7172606079f3114c/worldedit-bukkit/src/main/java/com/sk89q/worldedit/bukkit/BukkitBlockRegistry.java#L155
+ * - https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/345785a25e1eb83e0bb4aa3b8da84e52240772ff/worldedit-bukkit/src/main/java/com/sk89q/worldedit/bukkit/BukkitWorld.java#L136
+ */
 public abstract class AbstractCustomBlocksManager<B,BS,CP>
 {
     Field field_BLOCK_MATERIAL;
@@ -23,8 +28,8 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
     HashMap<B, CachedCustomBlockInfo> registeredBlocks = new HashMap<>();
     HashMap<Integer, B> registeredBlocks_stateIds = new HashMap<>();
     AbstractPacketListener packet;
+    @Nullable
     Plugin plugin;
-    boolean isFirstLoad = true;
 
     public static AbstractCustomBlocksManager inst;
 
@@ -33,13 +38,14 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
         inst = this;
     }
 
-    public static AbstractCustomBlocksManager initNms(Plugin plugin)
+    public static AbstractCustomBlocksManager initNms()
     {
-        return Nms.findImplementation(AbstractCustomBlocksManager.class, false, plugin);
+        return Nms.findImplementation(AbstractCustomBlocksManager.class, false);
     }
 
     public abstract void load(Plugin plugin, HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks);
-    public abstract void loadFromCache(Plugin plugin);
+    public abstract void loadFromCache();
+    public abstract void registerListener(Plugin plugin);
     abstract void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks);
 
     public void unregister()

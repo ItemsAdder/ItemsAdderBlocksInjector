@@ -1,9 +1,6 @@
 package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import dev.lone.blocksinjector.IrisHook;
 import dev.lone.blocksinjector.Nms;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
@@ -56,34 +53,16 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
         this.plugin = plugin;
 
         injectBlocks(namespacedBlocks);
-
-        if(packet == null)
-        {
-            packet = new dev.lone.blocksinjector.custom_blocks.nms.packetlistener.v1_18_R2(plugin);
-            ProtocolLibrary.getProtocolManager().addPacketListener(packet);
-        }
-
-        if(!isFirstLoad)
-        {
-            for (World world : Bukkit.getServer().getWorlds())
-            {
-                boolean unloaded = Bukkit.unloadWorld(world, false);
-                if (unloaded)
-                    Bukkit.getServer().createWorld(new WorldCreator(world.getName()));
-            }
-        }
-
-        isFirstLoad = false;
     }
 
     /**
      * Load namespacedIds from IA yml cached ids files
-     * @param plugin this plugin
      */
     @Override
-    public void loadFromCache(Plugin plugin)
+    public void loadFromCache()
     {
-        File storageFolder = new File(new File(plugin.getDataFolder().getParent(), "ItemsAdder"), "storage");
+        String pluginsFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+        File storageFolder = new File(new File(pluginsFolder, "ItemsAdder"), "storage");
         if(storageFolder.exists())
         {
 
@@ -102,9 +81,20 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     }
 
     @Override
+    public void registerListener(Plugin plugin)
+    {
+        this.plugin = plugin;
+        if(packet == null)
+        {
+            packet = new dev.lone.blocksinjector.custom_blocks.nms.packetlistener.v1_18_R2(plugin);
+            ProtocolLibrary.getProtocolManager().addPacketListener(packet);
+        }
+    }
+
+    @Override
     void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks)
     {
-        plugin.getLogger().info("Injecting " + customBlocks.size() + " blocks...");
+        Bukkit.getLogger().info("Injecting " + customBlocks.size() + " blocks...");
 
         unfreezeRegistry();
         customBlocks.forEach((cached, integer) -> {
@@ -112,7 +102,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
             Block internalBlock = isBlockAlreadyRegistered(cached);
             if(internalBlock != null)
             {
-                plugin.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
+                Bukkit.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
             }
             else
             {
@@ -127,7 +117,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                             internalBlock
                     );
                     internalBlock.getStateDefinition().getPossibleStates().forEach(Block.BLOCK_STATE_REGISTRY::add);
-                    plugin.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + internalBlock.getDescriptionId());
+                    Bukkit.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + internalBlock.getDescriptionId());
                     //</editor-fold>
 
                     //<editor-fold desc="Inject the block into the Bukkit lookup data structures to avoid incompatibilities with plugins">
@@ -137,7 +127,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                         HashMap<Block, Material> BLOCK_MATERIAL = (HashMap<Block, Material>) field_BLOCK_MATERIAL.get(null);
                         BLOCK_MATERIAL.put(internalBlock, Material.COBBLESTONE);
 
-                        plugin.getLogger().info("Injected block into Bukkit lookup: " + internalBlock.getDescriptionId());
+                        Bukkit.getLogger().info("Injected block into Bukkit lookup: " + internalBlock.getDescriptionId());
                     }
                     catch (IllegalAccessException e)
                     {
@@ -165,43 +155,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
         if(Bukkit.getPluginManager().getPlugin("Iris") != null)
             IrisHook.inject(customBlocks);
 
-        if(Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null)
-        {
-            try
-            {
-                Field field_worldNativeAccess = BukkitWorld.class.getDeclaredField("worldNativeAccess");
-                field_worldNativeAccess.setAccessible(true);
-
-                //TODO: maybe I also need to catch world loading events?
-                for (World w : Bukkit.getWorlds())
-                {
-                    BukkitWorld bukkitWorld = BukkitAdapter.asBukkitWorld(BukkitAdapter.adapt(w));
-                    WorldNativeAccess<?, ?, ?> worldNativeAccess = (WorldNativeAccess<?, ?, ?>) field_worldNativeAccess.get(bukkitWorld);
-
-
-                    Field field_paperweightFaweAdapter = worldNativeAccess.getClass().getDeclaredField("paperweightFaweAdapter");
-                    field_paperweightFaweAdapter.setAccessible(true);
-                    //PaperweightFaweAdapter
-                    Object paperweightFaweAdapter  = field_paperweightFaweAdapter.get(worldNativeAccess);
-
-                    Field field_initialised = paperweightFaweAdapter.getClass().getDeclaredField("initialised");
-                    field_initialised.setAccessible(true);
-                    field_initialised.set(paperweightFaweAdapter, false);
-
-
-                    Field field_ibdToStateOrdinal = paperweightFaweAdapter.getClass().getDeclaredField("ibdToStateOrdinal");
-                    field_ibdToStateOrdinal.setAccessible(true);
-                    field_ibdToStateOrdinal.set(paperweightFaweAdapter, null);
-                }
-
-            }
-            catch (NoSuchFieldException | IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        plugin.getLogger().info("Finished injecting blocks");
+        Bukkit.getLogger().info("Finished injecting blocks");
     }
 
     @Override
@@ -274,7 +228,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                 Block internalBlock = state.getBlock();
                 if (internalBlock.getDescriptionId().equals("block." + cached.namespace + "." + cached.key))
                 {
-                    plugin.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
+                    Bukkit.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
                     return internalBlock;
                 }
             }
