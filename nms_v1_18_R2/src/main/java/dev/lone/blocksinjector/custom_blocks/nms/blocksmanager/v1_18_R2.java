@@ -2,7 +2,8 @@ package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import dev.lone.blocksinjector.IrisHook;
-import dev.lone.blocksinjector.Nms;
+import dev.lone.blocksinjector.Main;
+import dev.lone.blocksinjector.custom_blocks.nms.Nms;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.lone.itemsadder.api.ItemsAdder;
@@ -102,7 +103,8 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
             Block internalBlock = isBlockAlreadyRegistered(cached);
             if(internalBlock != null)
             {
-                Bukkit.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
+                if(Main.instance.debug)
+                    Bukkit.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
             }
             else
             {
@@ -117,7 +119,8 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                             internalBlock
                     );
                     internalBlock.getStateDefinition().getPossibleStates().forEach(Block.BLOCK_STATE_REGISTRY::add);
-                    Bukkit.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + internalBlock.getDescriptionId());
+                    if(Main.instance.debug)
+                        Bukkit.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + internalBlock.getDescriptionId());
                     //</editor-fold>
 
                     //<editor-fold desc="Inject the block into the Bukkit lookup data structures to avoid incompatibilities with plugins">
@@ -127,7 +130,8 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                         HashMap<Block, Material> BLOCK_MATERIAL = (HashMap<Block, Material>) field_BLOCK_MATERIAL.get(null);
                         BLOCK_MATERIAL.put(internalBlock, Material.COBBLESTONE);
 
-                        Bukkit.getLogger().info("Injected block into Bukkit lookup: " + internalBlock.getDescriptionId());
+                        if(Main.instance.debug)
+                            Bukkit.getLogger().info("Injected block into Bukkit lookup: " + internalBlock.getDescriptionId());
                     }
                     catch (IllegalAccessException e)
                     {
@@ -155,7 +159,8 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
         if(Bukkit.getPluginManager().getPlugin("Iris") != null)
             IrisHook.inject(customBlocks);
 
-        Bukkit.getLogger().info("Finished injecting blocks");
+        if(Main.instance.debug)
+            Bukkit.getLogger().info("Finished injecting blocks");
     }
 
     @Override
@@ -182,7 +187,6 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     {
         Location blockLoc = e.getClickedBlock().getLocation();
         String descriptionId = ((CraftBlock) e.getClickedBlock()).getHandle().getBlockState(new BlockPos(blockLoc.getBlockX(), blockLoc.getBlockY(), blockLoc.getBlockZ())).getBlock().getDescriptionId();
-        e.getPlayer().sendMessage(descriptionId);
         String namespacedId = descriptionId.replace("block.", "").replace(".", ":");
         CustomBlock customBlock = CustomBlock.getInstance(namespacedId);
         if(customBlock != null) // Is a custom injected block
@@ -191,7 +195,6 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
             e.getPlayer().sendBlockChange(e.getClickedBlock().getLocation(), Material.AIR.createBlockData());
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 customBlock.place(e.getClickedBlock().getLocation());
-                e.getPlayer().sendMessage("Fixed injected block!");
             }, 0L);
         }
     }
@@ -214,7 +217,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
 
     @Override
     @Nullable
-    Block isBlockAlreadyRegistered(CachedCustomBlockInfo cached)
+    Block isBlockAlreadyRegistered(CachedCustomBlockInfo cached) // Is this function even making sense?
     {
         try
         {
@@ -227,10 +230,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
             {
                 Block internalBlock = state.getBlock();
                 if (internalBlock.getDescriptionId().equals("block." + cached.namespace + "." + cached.key))
-                {
-                    Bukkit.getLogger().warning("Block '" + internalBlock.getDescriptionId() + "' already registered, skipping.");
                     return internalBlock;
-                }
             }
         }
         return null;

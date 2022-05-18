@@ -1,7 +1,7 @@
 package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import dev.lone.blocksinjector.Nms;
+import dev.lone.blocksinjector.custom_blocks.nms.Nms;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.AbstractPacketListener;
 import org.bukkit.configuration.file.FileConfiguration;

@@ -1,7 +1,6 @@
-package dev.lone.blocksinjector;
+package dev.lone.blocksinjector.custom_blocks.nms;
 
-import dev.lone.itemsadder.Main;
-import dev.lone.itemsadder.Utils.Msg;
+import dev.lone.blocksinjector.Main;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,10 +59,10 @@ public class Nms
             if (ignoreError)
                 return null;
 
-            Msg.sendConsoleError("Error getting implementation for " + implClazz + " - NMS " + nmsVersion);
+            Bukkit.getLogger().severe("Error getting implementation for " + implClazz + " - NMS " + nmsVersion);
             e.printStackTrace();
 
-            Bukkit.getPluginManager().disablePlugin(Main.getPlugin());
+            Bukkit.getPluginManager().disablePlugin(Main.instance);
             Bukkit.shutdown();
         }
         return null;

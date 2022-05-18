@@ -12,6 +12,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin implements Listener
 {
+    public static Main instance;
+    public boolean debug;
+
     static
     {
         AbstractCustomBlocksManager.initNms();
@@ -21,6 +24,10 @@ public final class Main extends JavaPlugin implements Listener
     @Override
     public void onLoad()
     {
+        instance = this;
+
+        getConfig().getBoolean("debug", false);
+
         AbstractCustomBlocksManager.inst.registerListener(this);
     }
 
