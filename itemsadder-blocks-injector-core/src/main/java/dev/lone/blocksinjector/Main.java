@@ -13,18 +13,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin implements Listener
 {
-    // Important, to load before all plugins, for example FastAsyncWorldEdit is reading the Blocks registry and can't
-    // hook into the custom blocks because they don't exist in the onLoad/onEnable event.
     static
     {
         AbstractCustomBlocksManager.initNms();
         AbstractCustomBlocksManager.inst.loadFromCache();
-
-        if(Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null)
-        {
-            //BlockTypesCache.states // TODO: I might need to reset this because it seems that FAWE is caching blocks and bugs out
-        }
-
     }
 
     @Override
