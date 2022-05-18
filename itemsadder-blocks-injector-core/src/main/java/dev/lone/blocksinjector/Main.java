@@ -1,7 +1,6 @@
 package dev.lone.blocksinjector;
 
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.AbstractCustomBlocksManager;
-import dev.lone.itemsadder.api.Events.CustomBlockPlaceEvent;
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -46,16 +45,6 @@ public final class Main extends JavaPlugin implements Listener
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    private void place(CustomBlockPlaceEvent e)
-    {
-        e.setCancelled(true);
-        e.getItemInHand().setAmount(e.getItemInHand().getAmount() - 1);
-
-        e.getBlock().setBlockData(Bukkit.createBlockData(e.getNamespacedID()), false);
-    }
-
-    //TODO: refactor this shit
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onPlayerInteractEvent(PlayerInteractEvent e)
     {
         if(e.getHand() == EquipmentSlot.OFF_HAND)
@@ -67,7 +56,7 @@ public final class Main extends JavaPlugin implements Listener
         }
     }
 
-    //TODO
+    //TODO: maybe it's worth adding this to the vanilla command? idk if it's actually useful.
 //    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 //    private void tab(TabCompleteEvent e)
 //    {
