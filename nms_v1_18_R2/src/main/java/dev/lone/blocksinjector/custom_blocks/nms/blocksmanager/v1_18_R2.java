@@ -7,7 +7,6 @@ import dev.lone.blocksinjector.Settings;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.Nms;
 import dev.lone.itemsadder.api.CustomBlock;
-import dev.lone.itemsadder.api.ItemsAdder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -231,7 +230,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     public BlockState nmsBlockFromCached(CachedCustomBlockInfo cachedBlock)
     {
         //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
-        CraftBlockData bukkitData = (CraftBlockData) ItemsAdder.getBlockDataByInternalId(cachedBlock.id);
+        CraftBlockData bukkitData = (CraftBlockData) getItemsAdderBlockDataByInternalId(cachedBlock.id);
         return bukkitData.getState();
     }
 
@@ -239,7 +238,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     public BlockState nmsBlockStateFromBlockNamespacedId(int id)
     {
         //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
-        CraftBlockData bukkitData = (CraftBlockData) ItemsAdder.getBlockDataByInternalId(id);
+        CraftBlockData bukkitData = (CraftBlockData) getItemsAdderBlockDataByInternalId(id);
         return bukkitData.getState();
     }
 

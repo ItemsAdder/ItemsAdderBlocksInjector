@@ -4,6 +4,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import dev.lone.blocksinjector.custom_blocks.nms.Nms;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.AbstractPacketListener;
+import dev.lone.itemsadder.api.ItemsAdder;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -102,5 +104,13 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
     public boolean contains(int paletteId)
     {
         return registeredBlocks_stateIds.containsKey(paletteId);
+    }
+
+    /**
+     * Wrap the IA api method in case of future API changes
+     */
+    BlockData getItemsAdderBlockDataByInternalId(int id)
+    {
+        return ItemsAdder.Advanced.getBlockDataByInternalId(id);
     }
 }
