@@ -2,7 +2,12 @@
 
 Hack to inject blocks into the game blocks registry and change their texture on the client without mods.
 
-⚠️ Requires ItemsAdder 3.1.5
+⚠️ Requirements:
+- ItemsAdder 3.1.5+
+- Spigot 1.18.2+
+- ViaVersion
+- ProtocolLib
+- LoneLibs
 
 ### Example uses of this plugin
 - Add compatibility to Iris world generator and similar plugins
