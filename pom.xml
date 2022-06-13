@@ -17,6 +17,7 @@
     <version>LATEST_VER</version>
     <packaging>pom</packaging>
     <modules>
+        <module>nms_v1_19_R1</module>
         <module>nms_v1_18_R2</module>
         <module>nms_legacy</module>
         <module>itemsadder-blocks-injector-core</module>
