@@ -106,7 +106,6 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>libs</groupId>
             <artifactId>ViaVersion</artifactId>
@@ -114,7 +113,6 @@
             <scope>system</scope>
             <systemPath>${jars_libs_folder}/ViaVersion-4.1.1.jar</systemPath>
         </dependency>
-
         <dependency>
             <groupId>libs</groupId>
             <artifactId>ProtocolLib</artifactId>
@@ -122,7 +120,6 @@
             <scope>system</scope>
             <systemPath>${jars_libs_folder}/ProtocolLib.jar</systemPath>
         </dependency>
-
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
@@ -142,16 +139,15 @@
             <artifactId>ItemsAdder</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${plugins_folder}/ItemsAdder.jar</systemPath>
+            <systemPath>${jars_libs_folder}/ItemsAdder.jar</systemPath>
         </dependency>
-
-
         <dependency>
             <groupId>libs</groupId>
             <artifactId>IRIS</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${plugins_folder}/IRIS-EXPERIMENTAL-USEMASTERBRANCH.jar</systemPath>
+            <systemPath>${jars_libs_folder}/IRIS-EXPERIMENTAL-USEMASTERBRANCH.jar</systemPath>
         </dependency>
+
     </dependencies>
 </project>
