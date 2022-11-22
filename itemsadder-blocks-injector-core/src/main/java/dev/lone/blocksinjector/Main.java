@@ -1,7 +1,6 @@
 package dev.lone.blocksinjector;
 
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.AbstractCustomBlocksManager;
-import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,17 +13,16 @@ public final class Main extends JavaPlugin implements Listener
 {
     public static Main instance;
 
-    static
-    {
-        AbstractCustomBlocksManager.initNms();
-        AbstractCustomBlocksManager.inst.loadFromCache();
-
-        instance = (Main) Bukkit.getPluginManager().getPlugin("ItemsAdderBlocksInjector");
-    }
-
     @Override
     public void onLoad()
     {
+        instance = this;
+
+        Settings.init(instance);
+
+        AbstractCustomBlocksManager.initNms();
+        AbstractCustomBlocksManager.inst.loadFromCache();
+
         AbstractCustomBlocksManager.inst.registerListener(this);
     }
 
@@ -40,14 +38,6 @@ public final class Main extends JavaPlugin implements Listener
         AbstractCustomBlocksManager.inst.unregister();
     }
 
-    @EventHandler
-    public void onItemsAdderLoadData(ItemsAdderLoadDataEvent e)
-    {
-        if(e.getCause() == ItemsAdderLoadDataEvent.Cause.FIRST_LOAD)
-            return;
-        AbstractCustomBlocksManager.inst.loadFromCache();
-    }
-
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onPlayerInteractEvent(PlayerInteractEvent e)
     {
@@ -60,7 +50,9 @@ public final class Main extends JavaPlugin implements Listener
         }
     }
 
-    //TODO: maybe it's worth adding this to the vanilla command? idk if it's actually useful.
+    //TODO: Maybe it's worth adding custom blocks to the vanilla command? since they now will be correctly
+    // resolved by the internal Minecract code.
+    // Idk if it's actually useful.
 //    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 //    private void tab(TabCompleteEvent e)
 //    {

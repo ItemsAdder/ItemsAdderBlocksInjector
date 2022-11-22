@@ -30,13 +30,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+@SuppressWarnings("unused")
 public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, ClientboundLevelChunkPacketData>
 {
     public v1_18_R2()
@@ -52,39 +52,6 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
         }
         BUFFER_FIELD = ClientboundLevelChunkPacketData.class.getDeclaredFields()[2];
         BUFFER_FIELD.setAccessible(true);
-    }
-
-    @Override
-    public void load(Plugin plugin, HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks)
-    {
-        this.plugin = plugin;
-
-        injectBlocks(namespacedBlocks);
-    }
-
-    /**
-     * Load namespacedIds from IA yml cached ids files
-     */
-    @Override
-    public void loadFromCache()
-    {
-        String pluginsFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
-        File storageFolder = new File(new File(pluginsFolder, "ItemsAdder"), "storage");
-        if(storageFolder.exists())
-        {
-
-            HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks = new HashMap<>();
-            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_blocks_ids_cache"));
-            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_blocks_note_ids_cache"));
-            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_transparent_blocks_ids_cache"));
-            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_wire_ids_cache"));
-
-            load(plugin, namespacedBlocks);
-        }
-        else
-        {
-            throw new RuntimeException("ItemsAdder not installed");
-        }
     }
 
     @Override
@@ -117,7 +84,24 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
             {
                 try
                 {
-                    internalBlock = new Block(BlockBehaviour.Properties.copy(Blocks.COBBLESTONE));
+                    BlockBehaviour.Properties properties;
+                    switch (cached.type)
+                    {
+                        case REAL:
+                        case REAL_NOTE:
+                            properties = BlockBehaviour.Properties.copy(Blocks.NOTE_BLOCK);
+                            break;
+                        case REAL_TRANSPARENT:
+                            properties = BlockBehaviour.Properties.copy(Blocks.CHORUS_PLANT);
+                            break;
+                        case REAL_WIRE:
+                            properties = BlockBehaviour.Properties.copy(Blocks.TRIPWIRE);
+                            break;
+                        default:
+                            throw new RuntimeException("Not implemented!");
+                    }
+
+                    internalBlock = new Block(properties);
 
                     //<editor-fold desc="Inject the block into the Minecraft internal registry">
                     Registry.register(
@@ -127,7 +111,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                     );
                     internalBlock.getStateDefinition().getPossibleStates().forEach(Block.BLOCK_STATE_REGISTRY::add);
                     if(Settings.debug)
-                        Bukkit.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + internalBlock.getDescriptionId());
+                        Bukkit.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + cached.getNamespacedId());
                     //</editor-fold>
 
                     //<editor-fold desc="Inject the block into the Bukkit lookup data structures to avoid incompatibilities with plugins">
@@ -137,7 +121,7 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                         BLOCK_MATERIAL.put(internalBlock, Material.COBBLESTONE);
 
                         if(Settings.debug)
-                            Bukkit.getLogger().info("Injected block into Bukkit lookup: " + internalBlock.getDescriptionId());
+                            Bukkit.getLogger().info("Injected block into Bukkit lookup: " + cached.getNamespacedId());
                     }
                     catch (IllegalAccessException e)
                     {
@@ -145,8 +129,9 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                     }
                     //</editor-fold>
                 }
-                catch (IllegalStateException e)
+                catch (Throwable e)
                 {
+                    Bukkit.getLogger().warning("Error registering block '" + cached.getNamespacedId() + "'.");
                     e.printStackTrace();
                 }
             }

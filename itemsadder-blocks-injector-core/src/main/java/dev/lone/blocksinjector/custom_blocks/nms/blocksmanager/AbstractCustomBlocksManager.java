@@ -45,8 +45,36 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
         return Nms.findImplementation(AbstractCustomBlocksManager.class, false);
     }
 
-    public abstract void load(Plugin plugin, HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks);
-    public abstract void loadFromCache();
+    public void load(Plugin plugin, HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks)
+    {
+        this.plugin = plugin;
+        injectBlocks(namespacedBlocks);
+    }
+
+    /**
+     * Load namespacedIds from IA yml cached ids files
+     */
+    public void loadFromCache()
+    {
+        String pluginsFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+        File storageFolder = new File(new File(pluginsFolder, "ItemsAdder"), "storage");
+        if(storageFolder.exists())
+        {
+
+            HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks = new HashMap<>();
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_blocks_ids_cache", CachedCustomBlockInfo.Type.REAL));
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_blocks_note_ids_cache", CachedCustomBlockInfo.Type.REAL_NOTE));
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_transparent_blocks_ids_cache", CachedCustomBlockInfo.Type.REAL_TRANSPARENT));
+            namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_wire_ids_cache", CachedCustomBlockInfo.Type.REAL_WIRE));
+
+            load(plugin, namespacedBlocks);
+        }
+        else
+        {
+            throw new RuntimeException("ItemsAdder not installed");
+        }
+    }
+
     public abstract void registerListener(Plugin plugin);
     abstract void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks);
 
@@ -57,7 +85,7 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
     }
     abstract void unfreezeRegistry();
 
-    HashMap<CachedCustomBlockInfo, Integer> loadCacheFile(File storageFolder, String cacheFileName)
+    HashMap<CachedCustomBlockInfo, Integer> loadCacheFile(File storageFolder, String cacheFileName, CachedCustomBlockInfo.Type type)
     {
         HashMap<CachedCustomBlockInfo, Integer> map = new HashMap<>();
         File f = new File(storageFolder, cacheFileName + ".yml");
@@ -67,7 +95,7 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
             for (String key : cacheYml.getKeys(false))
             {
                 int id = cacheYml.getInt(key);
-                map.put(new CachedCustomBlockInfo(key, id), id);
+                map.put(new CachedCustomBlockInfo(key, id, type), id);
             }
         }
         return map;
