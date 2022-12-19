@@ -9,7 +9,6 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>
-        <plugins_folder>C:/Progetti/Minecraft/TestServer/1.19/plugins</plugins_folder>
     </properties>
 
     <groupId>dev.lone</groupId>
@@ -25,6 +24,6 @@
     </modules>
 
     <name>ItemsAdderBlocksInjector</name>
-    <url>matteodev.it</url>
+    <url>devs.beer</url>
 
 </project>

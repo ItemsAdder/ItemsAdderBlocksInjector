@@ -3,6 +3,7 @@ package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 import com.comphenix.protocol.ProtocolLibrary;
 import dev.lone.LoneLibs.nbt.nbtapi.NBTItem;
 import dev.lone.blocksinjector.IrisHook;
+import dev.lone.blocksinjector.Main;
 import dev.lone.blocksinjector.Settings;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.Nms;
@@ -27,8 +28,7 @@ import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
+import dev.lone.blocksinjector.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -55,12 +55,11 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     }
 
     @Override
-    public void registerListener(Plugin plugin)
+    public void registerListener()
     {
-        this.plugin = plugin;
         if(packet == null)
         {
-            packet = new dev.lone.blocksinjector.custom_blocks.nms.packetlistener.v1_19_R1(plugin);
+            packet = new dev.lone.blocksinjector.custom_blocks.nms.packetlistener.v1_19_R1(Main.inst);
             ProtocolLibrary.getProtocolManager().addPacketListener(packet);
         }
     }
@@ -85,17 +84,18 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                 try
                 {
                     BlockBehaviour.Properties properties;
+                    // Use similar blocks as base (similar breaking speed, server-side collisions, etc.)
                     switch (cached.type)
                     {
                         case REAL:
                         case REAL_NOTE:
-                            properties = BlockBehaviour.Properties.copy(Blocks.NOTE_BLOCK);
+                            properties = BlockBehaviour.Properties.copy(Blocks.QUARTZ_BLOCK);
                             break;
                         case REAL_TRANSPARENT:
-                            properties = BlockBehaviour.Properties.copy(Blocks.CHORUS_PLANT);
+                            properties = BlockBehaviour.Properties.copy(Blocks.END_ROD);
                             break;
                         case REAL_WIRE:
-                            properties = BlockBehaviour.Properties.copy(Blocks.TRIPWIRE);
+                            properties = BlockBehaviour.Properties.copy(Blocks.GRASS);
                             break;
                         default:
                             throw new RuntimeException("Not implemented!");
@@ -118,7 +118,7 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                     try
                     {
                         HashMap<Block, Material> BLOCK_MATERIAL = (HashMap<Block, Material>) field_BLOCK_MATERIAL.get(null);
-                        BLOCK_MATERIAL.put(internalBlock, Material.COBBLESTONE);
+                        BLOCK_MATERIAL.put(internalBlock, Material.COBBLESTONE); // Dummy Bukkit Material
 
                         if(Settings.debug)
                             Bukkit.getLogger().info("Injected block into Bukkit lookup: " + cached.getNamespacedId());
@@ -192,7 +192,7 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                 //<editor-fold desc="This is a fucking cheat to make the dig animation stop and avoid getting stuck breaking the block.">
                 e.setCancelled(true);
                 AtomicReference<ItemStack> prev = new AtomicReference<>();
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Bukkit.getScheduler().runTaskLater(Main.inst, () -> {
                     prev.set(player.getItemInHand());
 
                     ItemStack tmp = prev.get().clone();
@@ -202,7 +202,7 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
                     player.setItemInHand(n.getItem());
                 }, 1L);
 
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Bukkit.getScheduler().runTaskLater(Main.inst, () -> {
                     player.setItemInHand(prev.get());
                     customBlock.place(e.getClickedBlock().getLocation());
                 }, 2L);

@@ -45,7 +45,7 @@
                 </executions>
                 <configuration>
                     <finalName>${parent.artifactId}</finalName><!-- Jar file name is the parent module name -->
-                    <outputDirectory>${plugins_folder}</outputDirectory>
+                    <outputDirectory>${project.parent.basedir}/output</outputDirectory>
                     <descriptors>
                         <descriptor>jar-no-dependencies.xml</descriptor>
                     </descriptors>

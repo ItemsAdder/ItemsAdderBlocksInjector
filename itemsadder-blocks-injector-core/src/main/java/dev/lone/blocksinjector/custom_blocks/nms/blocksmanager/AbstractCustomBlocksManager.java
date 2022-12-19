@@ -1,16 +1,18 @@
 package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import dev.lone.blocksinjector.Main;
 import dev.lone.blocksinjector.custom_blocks.nms.Nms;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.AbstractPacketListener;
 import dev.lone.itemsadder.api.ItemsAdder;
+import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
+import dev.lone.blocksinjector.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -30,8 +32,6 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
     HashMap<B, CachedCustomBlockInfo> registeredBlocks = new HashMap<>();
     HashMap<Integer, B> registeredBlocks_stateIds = new HashMap<>();
     AbstractPacketListener packet;
-    @Nullable
-    Plugin plugin;
 
     public static AbstractCustomBlocksManager inst;
 
@@ -45,9 +45,8 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
         return Nms.findImplementation(AbstractCustomBlocksManager.class, false);
     }
 
-    public void load(Plugin plugin, HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks)
+    public void load(HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks)
     {
-        this.plugin = plugin;
         injectBlocks(namespacedBlocks);
     }
 
@@ -56,8 +55,15 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
      */
     public void loadFromCache()
     {
-        String pluginsFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
-        File storageFolder = new File(new File(pluginsFolder, "ItemsAdder"), "storage");
+        Plugin itemsadder = Bukkit.getPluginManager().getPlugin("ItemsAdder");
+        if(itemsadder == null)
+        {
+            Main.inst.getLogger().warning("ItemsAdder not installed");
+            Bukkit.getServer().shutdown();
+            return;
+        }
+
+        File storageFolder = new File(itemsadder.getDataFolder(), "storage");
         if(storageFolder.exists())
         {
 
@@ -67,15 +73,16 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
             namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_transparent_blocks_ids_cache", CachedCustomBlockInfo.Type.REAL_TRANSPARENT));
             namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_wire_ids_cache", CachedCustomBlockInfo.Type.REAL_WIRE));
 
-            load(plugin, namespacedBlocks);
+            load(namespacedBlocks);
         }
         else
         {
-            throw new RuntimeException("ItemsAdder not installed");
+            Main.inst.getLogger().warning("No ItemsAdder/storage folder found.");
+            Bukkit.getServer().shutdown();
         }
     }
 
-    public abstract void registerListener(Plugin plugin);
+    public abstract void registerListener();
     abstract void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks);
 
     public void unregister()

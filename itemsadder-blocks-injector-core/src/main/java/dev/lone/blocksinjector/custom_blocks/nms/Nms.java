@@ -2,7 +2,7 @@ package dev.lone.blocksinjector.custom_blocks.nms;
 
 import dev.lone.blocksinjector.Main;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.Nullable;
+import dev.lone.blocksinjector.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -62,7 +62,7 @@ public class Nms
             Bukkit.getLogger().severe("Error getting implementation for " + implClazz + " - NMS " + nmsVersion);
             e.printStackTrace();
 
-            Bukkit.getPluginManager().disablePlugin(Main.instance);
+            Bukkit.getPluginManager().disablePlugin(Main.inst); // Is this needed?
             Bukkit.shutdown();
         }
         return null;

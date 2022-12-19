@@ -11,19 +11,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin implements Listener
 {
-    public static Main instance;
+    public static Main inst;
 
     @Override
     public void onLoad()
     {
-        instance = this;
+        inst = this;
 
-        Settings.init(instance);
+        Settings.init(inst);
 
         AbstractCustomBlocksManager.initNms();
         AbstractCustomBlocksManager.inst.loadFromCache();
 
-        AbstractCustomBlocksManager.inst.registerListener(this);
+        AbstractCustomBlocksManager.inst.registerListener();
     }
 
     @Override
