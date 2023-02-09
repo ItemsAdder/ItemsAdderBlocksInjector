@@ -1,18 +1,16 @@
 package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 
-import com.comphenix.protocol.ProtocolLibrary;
 import dev.lone.blocksinjector.Main;
-import dev.lone.blocksinjector.custom_blocks.nms.Nms;
+import dev.lone.blocksinjector.annotations.Nullable;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
+import dev.lone.blocksinjector.custom_blocks.nms.Nms;
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.AbstractPacketListener;
 import dev.lone.itemsadder.api.ItemsAdder;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
-import dev.lone.blocksinjector.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -84,12 +82,6 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
 
     public abstract void registerListener();
     abstract void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks);
-
-    public void unregister()
-    {
-        if(packet != null)
-            ProtocolLibrary.getProtocolManager().removePacketListener(packet);
-    }
     abstract void unfreezeRegistry();
 
     HashMap<CachedCustomBlockInfo, Integer> loadCacheFile(File storageFolder, String cacheFileName, CachedCustomBlockInfo.Type type)
@@ -108,7 +100,6 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
         return map;
     }
 
-    public abstract void fixBlockInteract(PlayerInteractEvent e);
     public abstract BS nmsBlockFromCached(CachedCustomBlockInfo cachedBlock);
     public abstract BS nmsBlockStateFromBlockNamespacedId(int id);
     @Nullable
@@ -148,4 +139,6 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
     {
         return ItemsAdder.Advanced.getBlockDataByInternalId(id);
     }
+
+    public abstract String getDescriptionId(org.bukkit.block.Block bukkitBlock);
 }

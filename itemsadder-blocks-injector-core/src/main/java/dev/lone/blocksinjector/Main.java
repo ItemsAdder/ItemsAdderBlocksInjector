@@ -1,12 +1,10 @@
 package dev.lone.blocksinjector;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.AbstractCustomBlocksManager;
+import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.DigPacketListener;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin implements Listener
@@ -24,6 +22,7 @@ public final class Main extends JavaPlugin implements Listener
         AbstractCustomBlocksManager.inst.loadFromCache();
 
         AbstractCustomBlocksManager.inst.registerListener();
+        DigPacketListener.register();
     }
 
     @Override
@@ -35,19 +34,7 @@ public final class Main extends JavaPlugin implements Listener
     @Override
     public void onDisable()
     {
-        AbstractCustomBlocksManager.inst.unregister();
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    private void onPlayerInteractEvent(PlayerInteractEvent e)
-    {
-        if(e.getHand() == EquipmentSlot.OFF_HAND)
-            return;
-
-        if(e.hasBlock())
-        {
-            AbstractCustomBlocksManager.inst.fixBlockInteract(e);
-        }
+        ProtocolLibrary.getProtocolManager().removePacketListeners(this);
     }
 
     //TODO: Maybe it's worth adding custom blocks to the vanilla command? since they now will be correctly

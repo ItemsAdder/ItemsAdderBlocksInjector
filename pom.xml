@@ -8,7 +8,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>
+<!--        <jars_libs_folder>C:/Progetti/Minecraft/Spigot/_jars</jars_libs_folder>-->
+        <jars_libs_folder>C:/Progetti/Minecraft/TestServer/blank_template/template - crash generation/plugins/</jars_libs_folder>
     </properties>
 
     <groupId>dev.lone</groupId>
@@ -16,6 +17,7 @@
     <version>LATEST_VER</version>
     <packaging>pom</packaging>
     <modules>
+        <module>nms_v1_19_R2</module>
         <module>nms_v1_19_R1</module>
         <module>nms_v1_18_R2</module>
         <module>nms_legacy</module>

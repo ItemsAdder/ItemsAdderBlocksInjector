@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -20,9 +21,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -30,9 +31,9 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, ClientboundLevelChunkPacketData>
+public class v1_19_R2 extends AbstractCustomBlocksManager<Block, BlockState, ClientboundLevelChunkPacketData>
 {
-    public v1_19_R1()
+    public v1_19_R2()
     {
         try
         {
@@ -52,7 +53,7 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     {
         if(packet == null)
         {
-            packet = new dev.lone.blocksinjector.custom_blocks.nms.packetlistener.v1_19_R1(Main.inst);
+            packet = new dev.lone.blocksinjector.custom_blocks.nms.packetlistener.v1_19_R2(Main.inst);
             ProtocolLibrary.getProtocolManager().addPacketListener(packet);
         }
     }
@@ -98,7 +99,7 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
 
                     //<editor-fold desc="Inject the block into the Minecraft internal registry">
                     Registry.register(
-                            Registry.BLOCK,
+                            BuiltInRegistries.BLOCK,
                             new ResourceLocation(cached.namespace, cached.key),
                             internalBlock
                     );
@@ -138,7 +139,7 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
         });
 
         Blocks.rebuildCache();
-        Registry.BLOCK.freeze();
+        BuiltInRegistries.BLOCK.freeze();
 
         if(Bukkit.getPluginManager().getPlugin("Iris") != null)
             IrisHook.inject(customBlocks);
@@ -154,11 +155,11 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
         {
             Field intrusiveHolderCache = Nms.getField(MappedRegistry.class, Map.class, 5);
             intrusiveHolderCache.setAccessible(true);
-            intrusiveHolderCache.set(Registry.BLOCK, new IdentityHashMap<Block, Holder.Reference<Block>>());
+            intrusiveHolderCache.set(BuiltInRegistries.BLOCK, new IdentityHashMap<Block, Holder.Reference<Block>>());
 
             Field frozen = Nms.getField(MappedRegistry.class, boolean.class, 0);
             frozen.setAccessible(true);
-            frozen.set(Registry.BLOCK, false);
+            frozen.set(BuiltInRegistries.BLOCK, false);
         }
         catch (SecurityException | IllegalArgumentException | IllegalAccessException | NullPointerException e)
         {
@@ -208,6 +209,5 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     {
         Location blockLoc = bukkitBlock.getLocation();
         return ((CraftBlock) bukkitBlock).getHandle().getBlockState(new BlockPos(blockLoc.getBlockX(), blockLoc.getBlockY(), blockLoc.getBlockZ())).getBlock().getDescriptionId();
-
     }
 }

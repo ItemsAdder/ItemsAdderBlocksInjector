@@ -64,6 +64,12 @@
 
         <dependency>
             <groupId>dev.lone</groupId>
+            <artifactId>nms_v1_19_R2</artifactId>
+            <version>LATEST_VER</version>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.lone</groupId>
             <artifactId>nms_v1_19_R1</artifactId>
             <version>LATEST_VER</version>
         </dependency>

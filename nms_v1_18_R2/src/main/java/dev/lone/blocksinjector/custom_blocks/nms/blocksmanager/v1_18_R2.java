@@ -1,13 +1,12 @@
 package dev.lone.blocksinjector.custom_blocks.nms.blocksmanager;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import dev.lone.LoneLibs.nbt.nbtapi.NBTItem;
 import dev.lone.blocksinjector.IrisHook;
 import dev.lone.blocksinjector.Main;
 import dev.lone.blocksinjector.Settings;
+import dev.lone.blocksinjector.annotations.Nullable;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.Nms;
-import dev.lone.itemsadder.api.CustomBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -19,22 +18,16 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-import dev.lone.blocksinjector.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("unused")
 public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, ClientboundLevelChunkPacketData>
@@ -174,44 +167,6 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     }
 
     @Override
-    public void fixBlockInteract(PlayerInteractEvent e)
-    {
-        Location blockLoc = e.getClickedBlock().getLocation();
-        String descriptionId = ((CraftBlock) e.getClickedBlock()).getHandle().getBlockState(new BlockPos(blockLoc.getBlockX(), blockLoc.getBlockY(), blockLoc.getBlockZ())).getBlock().getDescriptionId();
-        String namespacedId = descriptionId.replace("block.", "").replace(".", ":");
-        CustomBlock customBlock = CustomBlock.getInstance(namespacedId);
-        if(customBlock != null) // Is a custom injected block
-        {
-            Player player = e.getPlayer();
-            if(player.getGameMode() == GameMode.CREATIVE)
-            {
-                customBlock.place(e.getClickedBlock().getLocation());
-            }
-            else
-            {
-                //<editor-fold desc="This is a fucking cheat to make the dig animation stop and avoid getting stuck breaking the block.">
-                e.setCancelled(true);
-                AtomicReference<ItemStack> prev = new AtomicReference<>();
-                Bukkit.getScheduler().runTaskLater(Main.inst, () -> {
-                    prev.set(player.getItemInHand());
-
-                    ItemStack tmp = prev.get().clone();
-                    NBTItem n = new NBTItem(tmp);
-                    n.setBoolean("sus", true);
-
-                    player.setItemInHand(n.getItem());
-                }, 1L);
-
-                Bukkit.getScheduler().runTaskLater(Main.inst, () -> {
-                    player.setItemInHand(prev.get());
-                    customBlock.place(e.getClickedBlock().getLocation());
-                }, 2L);
-                //</editor-fold>
-            }
-        }
-    }
-
-    @Override
     public BlockState nmsBlockFromCached(CachedCustomBlockInfo cachedBlock)
     {
         //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
@@ -246,5 +201,13 @@ public class v1_18_R2 extends AbstractCustomBlocksManager<Block, BlockState, Cli
             }
         }
         return null;
+    }
+
+    @Override
+    public String getDescriptionId(org.bukkit.block.Block bukkitBlock)
+    {
+        Location blockLoc = bukkitBlock.getLocation();
+        return ((CraftBlock) bukkitBlock).getHandle().getBlockState(new BlockPos(blockLoc.getBlockX(), blockLoc.getBlockY(), blockLoc.getBlockZ())).getBlock().getDescriptionId();
+
     }
 }
