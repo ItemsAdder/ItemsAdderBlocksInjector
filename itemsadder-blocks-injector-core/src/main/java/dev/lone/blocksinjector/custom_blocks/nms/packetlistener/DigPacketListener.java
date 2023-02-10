@@ -66,7 +66,9 @@ public class DigPacketListener extends AbstractPacketListener
                 {
                     if (player.getGameMode() == GameMode.CREATIVE)
                     {
-                        customBlock.place(block.getLocation());
+                        Bukkit.getScheduler().runTask(Main.inst, () -> {
+                            customBlock.place(block.getLocation());
+                        });
                         return;
                     }
 
