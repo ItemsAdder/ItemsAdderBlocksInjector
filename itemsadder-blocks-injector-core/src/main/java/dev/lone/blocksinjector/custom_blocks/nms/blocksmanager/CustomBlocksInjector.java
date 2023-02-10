@@ -22,25 +22,24 @@ import java.util.HashMap;
  * - https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/268d8cff49df810c5d8093aa7172606079f3114c/worldedit-bukkit/src/main/java/com/sk89q/worldedit/bukkit/BukkitBlockRegistry.java#L155
  * - https://github.com/IntellectualSites/FastAsyncWorldEdit/blob/345785a25e1eb83e0bb4aa3b8da84e52240772ff/worldedit-bukkit/src/main/java/com/sk89q/worldedit/bukkit/BukkitWorld.java#L136
  */
-public abstract class AbstractCustomBlocksManager<B,BS,CP>
+public abstract class CustomBlocksInjector<B,BS,CP>
 {
     Field field_BLOCK_MATERIAL;
     Field BUFFER_FIELD;
 
-    HashMap<B, CachedCustomBlockInfo> registeredBlocks = new HashMap<>();
-    HashMap<Integer, B> registeredBlocks_stateIds = new HashMap<>();
+    HashMap<String, CachedCustomBlockInfo> registeredBlocks = new HashMap<>();
     AbstractPacketListener packet;
 
-    public static AbstractCustomBlocksManager inst;
+    public static CustomBlocksInjector inst;
 
-    public AbstractCustomBlocksManager()
+    public CustomBlocksInjector()
     {
         inst = this;
     }
 
-    public static AbstractCustomBlocksManager initNms()
+    public static CustomBlocksInjector initNms()
     {
-        return Nms.findImplementation(AbstractCustomBlocksManager.class, false);
+        return Nms.findImplementation(CustomBlocksInjector.class, false);
     }
 
     public void load(HashMap<CachedCustomBlockInfo, Integer> namespacedBlocks)
@@ -100,8 +99,8 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
         return map;
     }
 
-    public abstract BS nmsBlockFromCached(CachedCustomBlockInfo cachedBlock);
-    public abstract BS nmsBlockStateFromBlockNamespacedId(int id);
+    public abstract BS calculateSpoofedNmsBlockFromItemsAdderCachedId(CachedCustomBlockInfo cachedBlock);
+    public abstract int calculateSpoofedNmsBlockIdFromCachedItemsAdderId(int itemsAdderId);
     @Nullable
     abstract B isBlockAlreadyRegistered(CachedCustomBlockInfo cached);
 
@@ -117,19 +116,14 @@ public abstract class AbstractCustomBlocksManager<B,BS,CP>
         }
     }
 
-    public CachedCustomBlockInfo get(B block)
+    public CachedCustomBlockInfo get(String blockDescription)
     {
-        return registeredBlocks.get(block);
+        return registeredBlocks.get(blockDescription);
     }
 
-    public boolean contains(B block)
+    public boolean contains(String blockDescription)
     {
-        return registeredBlocks.containsKey(block);
-    }
-
-    public boolean contains(int paletteId)
-    {
-        return registeredBlocks_stateIds.containsKey(paletteId);
+        return registeredBlocks.containsKey(blockDescription);
     }
 
     /**

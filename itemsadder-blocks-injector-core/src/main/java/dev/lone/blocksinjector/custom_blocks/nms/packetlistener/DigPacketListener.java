@@ -8,10 +8,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import dev.lone.blocksinjector.Main;
-import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.AbstractCustomBlocksManager;
+import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
 import dev.lone.itemsadder.api.CustomBlock;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -58,20 +57,12 @@ public class DigPacketListener extends AbstractPacketListener
                 Player player = e.getPlayer();
                 BlockPosition blockPosition = e.getPacket().getBlockPositionModifier().read(0);
                 Block block = blockPosition.toLocation(player.getWorld()).getBlock();
-                String descriptionId = AbstractCustomBlocksManager.inst.getDescriptionId(block);
+                String descriptionId = CustomBlocksInjector.inst.getDescriptionId(block);
                 String namespacedId = descriptionId.replace("block.", "").replace(".", ":");
                 CustomBlock customBlock = CustomBlock.getInstance(namespacedId);
 
                 if (customBlock != null) // Is a custom injected block
                 {
-                    if (player.getGameMode() == GameMode.CREATIVE)
-                    {
-                        Bukkit.getScheduler().runTask(Main.inst, () -> {
-                            customBlock.place(block.getLocation());
-                        });
-                        return;
-                    }
-
                     // Cancel the original packet
                     e.setCancelled(true);
 

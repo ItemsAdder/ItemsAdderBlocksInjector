@@ -1,7 +1,7 @@
 package dev.lone.blocksinjector;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.AbstractCustomBlocksManager;
+import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.DigPacketListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -18,10 +18,10 @@ public final class Main extends JavaPlugin implements Listener
 
         Settings.init(inst);
 
-        AbstractCustomBlocksManager.initNms();
-        AbstractCustomBlocksManager.inst.loadFromCache();
+        CustomBlocksInjector.initNms();
+        CustomBlocksInjector.inst.loadFromCache();
 
-        AbstractCustomBlocksManager.inst.registerListener();
+        CustomBlocksInjector.inst.registerListener();
         DigPacketListener.register();
     }
 

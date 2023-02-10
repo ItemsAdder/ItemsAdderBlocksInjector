@@ -30,7 +30,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, ClientboundLevelChunkPacketData>
+public class v1_19_R1 extends CustomBlocksInjector<Block, BlockState, ClientboundLevelChunkPacketData>
 {
     public v1_19_R1()
     {
@@ -131,10 +131,8 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
 
             if(internalBlock != null)
             {
-                registeredBlocks.put(internalBlock, cached);
-                registeredBlocks_stateIds.put(Block.BLOCK_STATE_REGISTRY.getId(internalBlock.defaultBlockState()), internalBlock);
+                registeredBlocks.put(internalBlock.getDescriptionId(), cached);
             }
-
         });
 
         Blocks.rebuildCache();
@@ -167,19 +165,19 @@ public class v1_19_R1 extends AbstractCustomBlocksManager<Block, BlockState, Cli
     }
 
     @Override
-    public BlockState nmsBlockFromCached(CachedCustomBlockInfo cachedBlock)
+    public BlockState calculateSpoofedNmsBlockFromItemsAdderCachedId(CachedCustomBlockInfo cachedBlock)
     {
         //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
-        CraftBlockData bukkitData = (CraftBlockData) getItemsAdderBlockDataByInternalId(cachedBlock.id);
+        CraftBlockData bukkitData = (CraftBlockData) getItemsAdderBlockDataByInternalId(cachedBlock.itemsAdderId);
         return bukkitData.getState();
     }
 
     @Override
-    public BlockState nmsBlockStateFromBlockNamespacedId(int id)
+    public int calculateSpoofedNmsBlockIdFromCachedItemsAdderId(int itemsAdderId)
     {
         //TODO: handle spawner blocks, I don't care, I won't support them. They are TILE entities and harder to support.
-        CraftBlockData bukkitData = (CraftBlockData) getItemsAdderBlockDataByInternalId(id);
-        return bukkitData.getState();
+        CraftBlockData bukkitData = (CraftBlockData) getItemsAdderBlockDataByInternalId(itemsAdderId);
+        return Block.BLOCK_STATE_REGISTRY.getId(bukkitData.getState());
     }
 
     @Override

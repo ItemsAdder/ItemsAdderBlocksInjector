@@ -1,19 +1,23 @@
 package dev.lone.blocksinjector.custom_blocks;
 
+import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
+
 public class CachedCustomBlockInfo
 {
     public final String namespace;
     public final String key;
-    public final int id;
+    public final int itemsAdderId;
     public final Type type;
+    public final int spoofedDataId;
 
-    public CachedCustomBlockInfo(String namespacedId, int id, Type type)
+    public CachedCustomBlockInfo(String namespacedId, int itemsAdderId, Type type)
     {
         String[] split = namespacedId.split(":");
         this.namespace = split[0];
         this.key = split[1];
-        this.id = id;
+        this.itemsAdderId = itemsAdderId;
         this.type = type;
+        this.spoofedDataId = CustomBlocksInjector.inst.calculateSpoofedNmsBlockIdFromCachedItemsAdderId(itemsAdderId);
     }
 
     public String getNamespacedId()
