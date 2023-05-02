@@ -1,0 +1,20 @@
+name: Add issues to project
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_url:
+        type: string 
+        description: Project URL
+      message:
+        required: true
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: ${{ github.event.inputs.project_url }}
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
