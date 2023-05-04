@@ -111,7 +111,7 @@
             <artifactId>ViaVersion</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/ViaVersion-4.5.2-SNAPSHOT (1).jar</systemPath>
+            <systemPath>${jars_libs_folder}/ViaVersion-4.1.1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>libs</groupId>
@@ -146,7 +146,7 @@
             <artifactId>IRIS</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/Iris-2.3.14-1.19.3.jar</systemPath>
+            <systemPath>${jars_libs_folder}/Iris-2.6.1-1.19.4.jar</systemPath>
         </dependency>
 
     </dependencies>
