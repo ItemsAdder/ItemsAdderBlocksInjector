@@ -16,6 +16,8 @@
     <version>LATEST_VER</version>
     <packaging>pom</packaging>
     <modules>
+        <module>nms_v1_20_R3</module>
+        <module>nms_v1_20_R2</module>
         <module>nms_v1_20_R1</module>
         <module>nms_v1_19_R3</module>
         <module>nms_v1_19_R2</module>
@@ -28,5 +30,19 @@
 
     <name>ItemsAdderBlocksInjector</name>
     <url>devs.beer</url>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>bytecode.space</id>
+            <url>https://repo.bytecode.space/repository/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
 
 </project>

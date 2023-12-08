@@ -28,7 +28,7 @@ public class Nms
     }
 
     /**
-     * Gets a suitable implementaion for the current Minecraft server version.
+     * Gets a suitable implementation for the current Minecraft server version.
      *
      * @param implClazz   the interface class which every implementation implements.
      * @param ignoreError If loading errors should be ignored, for example if no implementation exists. This is hacky but can
