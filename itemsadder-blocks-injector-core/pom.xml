@@ -5,7 +5,7 @@
     <parent>
         <artifactId>itemsadder-blocks-injector</artifactId>
         <groupId>dev.lone</groupId>
-        <version>LATEST_VER</version>
+        <version>0.0.13</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,17 +14,6 @@
 
     <build>
         <plugins>
-            <!-- To remove the manifest files-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

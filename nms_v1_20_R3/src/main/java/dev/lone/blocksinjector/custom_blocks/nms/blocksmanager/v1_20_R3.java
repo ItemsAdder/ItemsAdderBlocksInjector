@@ -89,7 +89,7 @@ public class v1_20_R3 extends CustomBlocksInjector<Block, BlockState, Clientboun
                             properties = BlockBehaviour.Properties.ofFullCopy(Blocks.END_ROD);
                             break;
                         case REAL_WIRE:
-                            properties = BlockBehaviour.Properties.ofFullCopy(Blocks.GRASS_BLOCK);
+                            properties = BlockBehaviour.Properties.ofFullCopy(Blocks.SHORT_GRASS);
                             break;
                         default:
                             throw new RuntimeException("Not implemented!");

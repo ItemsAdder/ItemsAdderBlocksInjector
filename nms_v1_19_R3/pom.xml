@@ -10,22 +10,11 @@
     <parent>
         <groupId>dev.lone</groupId>
         <artifactId>itemsadder-blocks-injector</artifactId>
-        <version>LATEST_VER</version>
+        <version>0.0.13</version>
     </parent>
 
     <build>
         <plugins>
-            <!-- To remove the manifest files-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
@@ -73,7 +62,7 @@
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>itemsadder-blocks-injector-core</artifactId>
-            <version>LATEST_VER</version>
+            <version>0.0.13</version>
             <scope>provided</scope>
         </dependency>
 
