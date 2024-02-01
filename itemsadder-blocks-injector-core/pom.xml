@@ -100,7 +100,7 @@
             <artifactId>ViaVersion</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${jars_libs_folder}/ViaVersion-4.7.1-SNAPSHOT.jar</systemPath>
+            <systemPath>${jars_libs_folder}/ViaVersion-4.9.3-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>libs</groupId>

@@ -8,7 +8,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.type.types.version.ChunkSectionType1_18;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_18;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
 import io.netty.buffer.ByteBuf;
