@@ -1,6 +1,7 @@
 package dev.lone.blocksinjector.custom_blocks.nms;
 
 import dev.lone.blocksinjector.Main;
+import lonelibs.dev.lone.fastnbt.nms.Version;
 import org.bukkit.Bukkit;
 import dev.lone.blocksinjector.annotations.Nullable;
 
@@ -39,7 +40,7 @@ public class Nms
     @SuppressWarnings("unchecked")
     public static <T> T findImplementation(Class<T> implClazz, boolean ignoreError, Object ...args)
     {
-        String nmsVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+        String nmsVersion = Version.get().name();
 
         try
         {
