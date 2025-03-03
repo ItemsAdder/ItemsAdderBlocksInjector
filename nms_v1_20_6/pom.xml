@@ -10,7 +10,7 @@
     <parent>
         <groupId>dev.lone</groupId>
         <artifactId>itemsadder-blocks-injector</artifactId>
-        <version>0.0.15</version>
+        <version>0.0.16</version>
     </parent>
 
     <properties>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>itemsadder-blocks-injector-core</artifactId>
-            <version>0.0.15</version>
+            <version>0.0.16</version>
             <scope>provided</scope>
         </dependency>
 

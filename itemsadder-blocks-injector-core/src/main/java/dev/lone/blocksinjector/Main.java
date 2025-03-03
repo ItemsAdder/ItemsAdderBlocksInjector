@@ -20,9 +20,20 @@ public final class Main extends JavaPlugin implements Listener
 
         Settings.init(inst);
 
-        CustomBlocksInjector.initNms();
-        CustomBlocksInjector.inst.loadFromCache();
 
+        try
+        {
+            CustomBlocksInjector.initNms();
+        }
+        catch (Throwable e)
+        {
+            getLogger().severe("Failed to initialize NMS. Please check the console for more information.");
+            e.printStackTrace();
+            Bukkit.shutdown();
+            return;
+        }
+
+        CustomBlocksInjector.inst.loadFromCache();
         CustomBlocksInjector.inst.registerListener();
         DigPacketListener.register();
     }

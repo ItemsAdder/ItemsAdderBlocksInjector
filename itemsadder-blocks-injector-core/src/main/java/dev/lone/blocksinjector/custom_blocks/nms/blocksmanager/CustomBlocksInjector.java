@@ -70,7 +70,16 @@ public abstract class CustomBlocksInjector<B,BS,CP>
             namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_transparent_blocks_ids_cache", CachedCustomBlockInfo.Type.REAL_TRANSPARENT));
             namespacedBlocks.putAll(loadCacheFile(storageFolder, "real_wire_ids_cache", CachedCustomBlockInfo.Type.REAL_WIRE));
 
-            load(namespacedBlocks);
+            try
+            {
+                load(namespacedBlocks);
+            }
+            catch (Exception e)
+            {
+                Main.inst.getLogger().warning("Error loading custom blocks from ItemsAdder cache files.");
+                e.printStackTrace();
+                Bukkit.getServer().shutdown();
+            }
         }
         else
         {

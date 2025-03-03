@@ -7,9 +7,12 @@ import dev.lone.blocksinjector.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class Nms
 {
+    @Nullable
     public static Field getField(Class<?> clazz, Class<?> type, int index)
     {
         int i = 0;
@@ -65,6 +68,77 @@ public class Nms
 
             Bukkit.getPluginManager().disablePlugin(Main.inst); // Is this needed?
             Bukkit.shutdown();
+        }
+        return null;
+    }
+
+    public enum MethodVisibility
+    {
+        PUBLIC,
+        PROTECTED,
+        PRIVATE,
+        PACKAGE_PRIVATE
+    }
+
+    public static Method findMethod(Class<?> clazz, String name, Class<?> ... argsTypes)
+    {
+        try
+        {
+            Method method = clazz.getDeclaredMethod(name, argsTypes);
+            method.setAccessible(true);
+            return method;
+        }
+        catch (NoSuchMethodException e)
+        {
+            return null;
+        }
+    }
+
+    public static Method findMethod(Class<Void> returnType, Class<?> clazz, MethodVisibility type, Class<?> ... argsTypes)
+    {
+        for (Method method : clazz.getDeclaredMethods())
+        {
+            switch (type)
+            {
+                case PUBLIC:
+                    if (!Modifier.isPublic(method.getModifiers()))
+                        continue;
+                    break;
+                case PROTECTED:
+                    if (!Modifier.isProtected(method.getModifiers()))
+                        continue;
+                    break;
+                case PRIVATE:
+                    if (!Modifier.isPrivate(method.getModifiers()))
+                        continue;
+                    break;
+                case PACKAGE_PRIVATE:
+                    if (Modifier.isPublic(method.getModifiers()) || Modifier.isProtected(method.getModifiers()) || Modifier.isPrivate(method.getModifiers()))
+                        continue;
+                    break;
+            }
+
+            if (method.getReturnType() != returnType)
+                continue;
+
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (parameterTypes.length == argsTypes.length)
+            {
+                boolean match = true;
+                for (int i = 0; i < parameterTypes.length; i++)
+                {
+                    if (parameterTypes[i] != argsTypes[i])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match)
+                {
+                    method.setAccessible(true);
+                    return method;
+                }
+            }
         }
         return null;
     }

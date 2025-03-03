@@ -1,5 +1,5 @@
 name: ItemsAdderBlocksInjector
-version: 0.0.15
+version: 0.0.16
 main: dev.lone.blocksinjector.Main
 api-version: 1.13
 load: STARTUP
