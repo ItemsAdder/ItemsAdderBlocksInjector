@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nms_v1_20_6</artifactId>
+    <artifactId>nms_v1_21_5</artifactId>
     <packaging>jar</packaging>
 
     <parent>
@@ -14,8 +14,8 @@
     </parent>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <build>
@@ -23,7 +23,7 @@
             <plugin>
                 <groupId>ca.bkaw</groupId>
                 <artifactId>paper-nms-maven-plugin</artifactId>
-                <version>1.4.4</version>
+                <version>1.4.7</version>
                 <executions>
                     <execution>
                         <phase>process-classes</phase>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>ca.bkaw</groupId>
             <artifactId>paper-nms</artifactId>
-            <version>1.20.6-SNAPSHOT</version>
+            <version>1.21.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
