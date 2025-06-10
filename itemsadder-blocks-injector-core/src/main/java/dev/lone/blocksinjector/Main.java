@@ -51,27 +51,8 @@ public final class Main extends JavaPlugin implements Listener
             return;
         }
 
-        //<editor-fold desc="Check LoneLibs compatibility">
-        {
-            boolean compatible = false;
-            try
-            {
-                //noinspection UnnecessaryFullyQualifiedName
-                dev.lone.LoneLibs.LoneLibs.CompareVersionResult compareVersionResult = dev.lone.LoneLibs.LoneLibs.compareVersion("1.0.45");
-                //noinspection UnnecessaryFullyQualifiedName
-                compatible = compareVersionResult == dev.lone.LoneLibs.LoneLibs.CompareVersionResult.INSTALLED_IS_SAME
-                        || compareVersionResult == dev.lone.LoneLibs.LoneLibs.CompareVersionResult.INSTALLED_IS_NEWER;
-            }
-            catch (Throwable ignored) {}
-            if (!compatible)
-            {
-                Msg.error("Please update LoneLibs! https://a.devs.beer/ia-install-lonelibs");
-                Bukkit.getPluginManager().disablePlugin(this);
-                Bukkit.shutdown();
-                return;
-            }
-        }
-        //</editor-fold>
+        if(Bukkit.getPluginManager().isPluginEnabled("LoneLibs"))
+            Msg.warn("LoneLibs is enabled. This plugin is not needed anymore and it's recommended to remove it (if you are not using it for other plugins).");
     }
 
     @Override

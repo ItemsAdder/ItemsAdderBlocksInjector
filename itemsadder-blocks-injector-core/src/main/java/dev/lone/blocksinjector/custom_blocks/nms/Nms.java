@@ -1,7 +1,7 @@
 package dev.lone.blocksinjector.custom_blocks.nms;
 
+import beer.devs.fastnbt.nms.Version;
 import dev.lone.blocksinjector.Main;
-import lonelibs.dev.lone.fastnbt.nms.Version;
 import org.bukkit.Bukkit;
 import dev.lone.blocksinjector.annotations.Nullable;
 

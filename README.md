@@ -7,7 +7,6 @@ Hack to inject blocks into the game blocks registry and change their texture on 
 - Spigot 1.18.2+
 - ViaVersion
 - ProtocolLib
-- LoneLibs
 
 ### Example uses of this plugin
 - Add compatibility to Iris world generator and similar plugins

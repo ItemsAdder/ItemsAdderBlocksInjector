@@ -5,7 +5,7 @@
     <parent>
         <artifactId>itemsadder-blocks-injector</artifactId>
         <groupId>dev.lone</groupId>
-        <version>0.0.17</version>
+        <version>0.0.18</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -117,11 +117,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>libs</groupId>
-            <artifactId>LoneLibs</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${jars_libs_folder}/LoneLibs.jar</systemPath>
+            <groupId>beer.devs</groupId>
+            <artifactId>FastNbt-jar</artifactId>
+            <version>1.4.8</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>libs</groupId>
