@@ -18,6 +18,8 @@ public final class Main extends JavaPlugin implements Listener
     {
         inst = this;
 
+        new LibsLoader(this).loadAll();
+
         Settings.init(inst);
 
 

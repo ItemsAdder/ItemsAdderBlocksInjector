@@ -26,6 +26,7 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -44,8 +45,12 @@ public class v1_20_6 extends CustomBlocksInjector<Block, BlockState, Clientbound
         {
             e.printStackTrace();
         }
-        BUFFER_FIELD = ClientboundLevelChunkPacketData.class.getDeclaredFields()[2];
-        BUFFER_FIELD.setAccessible(true);
+
+        BUFFER_FIELD = Arrays.stream(ClientboundLevelChunkPacketData.class.getDeclaredFields())
+                .filter(f -> f.getType() == byte[].class)
+                .peek(f -> f.setAccessible(true))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No byte[] field found in ClientboundLevelChunkPacketData"));
     }
 
     @Override
@@ -61,6 +66,8 @@ public class v1_20_6 extends CustomBlocksInjector<Block, BlockState, Clientbound
     @Override
     void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks)
     {
+        REGISTRY.clear();
+        
         if(Settings.debug)
             Bukkit.getLogger().info("Injecting " + customBlocks.size() + " blocks...");
 
@@ -77,23 +84,16 @@ public class v1_20_6 extends CustomBlocksInjector<Block, BlockState, Clientbound
             {
                 try
                 {
-                    BlockBehaviour.Properties properties;
                     // Use similar blocks as base (similar breaking speed, server-side collisions, etc.)
-                    switch (cached.type)
+                    BlockBehaviour.Properties properties = switch (cached.type)
                     {
-                        case REAL:
-                        case REAL_NOTE:
-                            properties = BlockBehaviour.Properties.ofFullCopy(Blocks.QUARTZ_BLOCK);
-                            break;
-                        case REAL_TRANSPARENT:
-                            properties = BlockBehaviour.Properties.ofFullCopy(Blocks.END_ROD);
-                            break;
-                        case REAL_WIRE:
-                            properties = BlockBehaviour.Properties.ofFullCopy(Blocks.SHORT_GRASS);
-                            break;
-                        default:
-                            throw new RuntimeException("Not implemented!");
-                    }
+                        case REAL, REAL_NOTE ->
+                                BlockBehaviour.Properties.ofFullCopy(Blocks.QUARTZ_BLOCK);
+                        case REAL_TRANSPARENT ->
+                                BlockBehaviour.Properties.ofFullCopy(Blocks.END_ROD).lightLevel(value -> 0);
+                        case REAL_WIRE -> BlockBehaviour.Properties.ofFullCopy(Blocks.SHORT_GRASS);
+                        default -> throw new RuntimeException("Not implemented!");
+                    };
 
                     internalBlock = new Block(properties);
 

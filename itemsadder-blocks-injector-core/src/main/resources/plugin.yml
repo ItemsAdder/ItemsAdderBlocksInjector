@@ -1,5 +1,5 @@
 name: ItemsAdderBlocksInjector
-version: 0.0.18
+version: 0.0.19
 main: dev.lone.blocksinjector.Main
 api-version: 1.13
 load: STARTUP
@@ -8,5 +8,5 @@ softdepend:
 depend:
   - ItemsAdder
   - ViaVersion
-libraries:
-  - beer.devs:FastNbt-jar:1.4.8
+libraries-libby:
+  - beer.devs:FastNbt-jar:1.4.10

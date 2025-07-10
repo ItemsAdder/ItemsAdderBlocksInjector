@@ -5,7 +5,7 @@
     <parent>
         <artifactId>itemsadder-blocks-injector</artifactId>
         <groupId>dev.lone</groupId>
-        <version>0.0.18</version>
+        <version>0.0.19</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>itemsadder-blocks-injector-jar</artifactId>
@@ -41,6 +41,39 @@
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.3</version>
+                <configuration>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.alessiodp</pattern>
+                            <shadedPattern>dev.lone.blocksinjector.shaded.com.alessiodp</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.jetbrains</pattern>
+                            <shadedPattern>dev.lone.blocksinjector.shaded.org.jetbrains</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.intellij</pattern>
+                            <shadedPattern>dev.lone.blocksinjector.shaded.org.intellij</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -48,63 +81,73 @@
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>itemsadder-blocks-injector-core</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
 
         <dependency>
             <groupId>dev.lone</groupId>
+            <artifactId>nms_v1_21_7</artifactId>
+            <version>0.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.lone</groupId>
+            <artifactId>nms_v1_21_6</artifactId>
+            <version>0.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.lone</groupId>
             <artifactId>nms_v1_21_5</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_21_4</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_21_1</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_20_6</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_20_R3</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_20_R2</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_20_R1</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_19_R3</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_19_R2</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_19_R1</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
         <dependency>
             <groupId>dev.lone</groupId>
             <artifactId>nms_v1_18_R2</artifactId>
-            <version>0.0.18</version>
+            <version>0.0.19</version>
         </dependency>
 
     </dependencies>

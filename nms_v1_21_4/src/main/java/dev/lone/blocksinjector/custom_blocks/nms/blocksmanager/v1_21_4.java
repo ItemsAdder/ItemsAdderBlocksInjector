@@ -43,8 +43,12 @@ public class v1_21_4 extends CustomBlocksInjector<Block, BlockState, Clientbound
         {
             throw new RuntimeException(e);
         }
-        BUFFER_FIELD = ClientboundLevelChunkPacketData.class.getDeclaredFields()[2];
-        BUFFER_FIELD.setAccessible(true);
+
+        BUFFER_FIELD = Arrays.stream(ClientboundLevelChunkPacketData.class.getDeclaredFields())
+                .filter(f -> f.getType() == byte[].class)
+                .peek(f -> f.setAccessible(true))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No byte[] field found in ClientboundLevelChunkPacketData"));
     }
 
     @Override
@@ -103,7 +107,7 @@ public class v1_21_4 extends CustomBlocksInjector<Block, BlockState, Clientbound
                     BlockBehaviour.Properties properties = switch (cached.type)
                     {
                         case REAL, REAL_NOTE -> BlockBehaviour.Properties.ofFullCopy(Blocks.QUARTZ_BLOCK);
-                        case REAL_TRANSPARENT -> BlockBehaviour.Properties.ofFullCopy(Blocks.END_ROD);
+                        case REAL_TRANSPARENT -> BlockBehaviour.Properties.ofFullCopy(Blocks.END_ROD).lightLevel(value -> 0);
                         case REAL_WIRE -> BlockBehaviour.Properties.ofFullCopy(Blocks.SHORT_GRASS);
                         default -> throw new RuntimeException("Not implemented!");
                     };
@@ -149,6 +153,8 @@ public class v1_21_4 extends CustomBlocksInjector<Block, BlockState, Clientbound
                         throw new RuntimeException(e);
                     }
                     //</editor-fold>
+
+                    REGISTRY.add(internalBlock);
 
                     if (Settings.debug)
                         Main.inst.getLogger().info("Injected block into Minecraft Registry.BLOCK: " + cached.getNamespacedId());

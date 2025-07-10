@@ -11,15 +11,22 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_18;
 import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
+import dev.lone.itemsadder.api.CustomBlock;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -160,6 +167,39 @@ public class v1_21_4 extends AbstractPacketListener
                     else
                     {
                         blockStates[i] = blockState;
+                    }
+                }
+            }
+            else if (e.getPacketType() == PacketType.Play.Server.WORLD_PARTICLES)
+            {
+                ClientboundLevelParticlesPacket particlesPacket = (ClientboundLevelParticlesPacket) e.getPacket().getHandle();
+                if(particlesPacket.getParticle() instanceof BlockParticleOption blockParticleOption)
+                {
+                    if(CustomBlocksInjector.inst.REGISTRY.contains(blockParticleOption.getState().getBlock()))
+                    {
+                        e.setCancelled(true);
+
+                        // block.namespace.id
+                        String descriptionId = blockParticleOption.getState().getBlock().getDescriptionId();
+                        String[] split = descriptionId.split("\\.");
+                        NamespacedKey key = new NamespacedKey(split[1], split[2]);
+                        BlockData itemsaAdderBlockData = CustomBlock.getBaseBlockData(key.toString());
+
+                        BlockParticleOption newBlockstateOption = new BlockParticleOption(blockParticleOption.getType(), ((CraftBlockData) itemsaAdderBlockData).getState());
+                        ClientboundLevelParticlesPacket newPacket = new ClientboundLevelParticlesPacket(
+                                newBlockstateOption,
+                                particlesPacket.isOverrideLimiter(),
+                                particlesPacket.alwaysShow(),
+                                particlesPacket.getX(),
+                                particlesPacket.getY(),
+                                particlesPacket.getZ(),
+                                particlesPacket.getXDist(),
+                                particlesPacket.getYDist(),
+                                particlesPacket.getZDist(),
+                                particlesPacket.getMaxSpeed(),
+                                particlesPacket.getCount()
+                        );
+                        ((CraftPlayer) e.getPlayer()).getHandle().connection.send(newPacket);
                     }
                 }
             }

@@ -15,6 +15,8 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Not compatible with FAWE.
@@ -24,6 +26,8 @@ import java.util.HashMap;
  */
 public abstract class CustomBlocksInjector<B,BS,CP>
 {
+    public Set<B> REGISTRY = new HashSet<>();
+
     Field field_BLOCK_MATERIAL;
     Field BUFFER_FIELD;
 

@@ -25,6 +25,7 @@ import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -43,8 +44,12 @@ public class v1_19_R1 extends CustomBlocksInjector<Block, BlockState, Clientboun
         {
             e.printStackTrace();
         }
-        BUFFER_FIELD = ClientboundLevelChunkPacketData.class.getDeclaredFields()[2];
-        BUFFER_FIELD.setAccessible(true);
+
+        BUFFER_FIELD = Arrays.stream(ClientboundLevelChunkPacketData.class.getDeclaredFields())
+                .filter(f -> f.getType() == byte[].class)
+                .peek(f -> f.setAccessible(true))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No byte[] field found in ClientboundLevelChunkPacketData"));
     }
 
     @Override
@@ -60,6 +65,8 @@ public class v1_19_R1 extends CustomBlocksInjector<Block, BlockState, Clientboun
     @Override
     void injectBlocks(HashMap<CachedCustomBlockInfo, Integer> customBlocks)
     {
+        REGISTRY.clear();
+        
         if(Settings.debug)
             Bukkit.getLogger().info("Injecting " + customBlocks.size() + " blocks...");
 
@@ -85,7 +92,7 @@ public class v1_19_R1 extends CustomBlocksInjector<Block, BlockState, Clientboun
                             properties = BlockBehaviour.Properties.copy(Blocks.QUARTZ_BLOCK);
                             break;
                         case REAL_TRANSPARENT:
-                            properties = BlockBehaviour.Properties.copy(Blocks.END_ROD);
+                            properties = BlockBehaviour.Properties.copy(Blocks.END_ROD).lightLevel(value -> 0);
                             break;
                         case REAL_WIRE:
                             properties = BlockBehaviour.Properties.copy(Blocks.GRASS);
