@@ -21,11 +21,11 @@ import org.bukkit.entity.Player;
  *
  * This trick fixes it.
  */
-public class DigPacketListener extends AbstractPacketListener
+public class LegacyDigPacketListener extends AbstractPacketListener
 {
     private static boolean registered;
 
-    public DigPacketListener()
+    public LegacyDigPacketListener()
     {
         super(Main.inst, ListenerPriority.LOWEST, PacketType.Play.Client.BLOCK_DIG);
     }
@@ -34,7 +34,7 @@ public class DigPacketListener extends AbstractPacketListener
     {
         if(registered)
             return;
-        ProtocolLibrary.getProtocolManager().addPacketListener(new DigPacketListener());
+        ProtocolLibrary.getProtocolManager().addPacketListener(new LegacyDigPacketListener());
         registered = true;
     }
 

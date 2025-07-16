@@ -3,7 +3,7 @@ package dev.lone.blocksinjector;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
-import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.DigPacketListener;
+import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.LegacyDigPacketListener;
 import dev.lone.itemsadder.utils.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -37,7 +37,27 @@ public final class Main extends JavaPlugin implements Listener
 
         CustomBlocksInjector.inst.loadFromCache();
         CustomBlocksInjector.inst.registerListener();
-        DigPacketListener.register();
+
+        if(isItemsAdderPre4_0_12())
+            LegacyDigPacketListener.register();
+    }
+
+    private boolean isItemsAdderPre4_0_12()
+    {
+        // Check if ItemsAdder version is lower than 4.0.12
+        String itemsAdderVersion = Bukkit.getPluginManager().getPlugin("ItemsAdder").getDescription().getVersion();
+        String[] versionParts = itemsAdderVersion.split("\\.");
+        int major = Integer.parseInt(versionParts[0]);
+        int minor = Integer.parseInt(versionParts[1]);
+        int patch = 0;
+
+        if (versionParts.length > 2)
+        {
+            String patchStr = versionParts[2].split("[^0-9]")[0]; // Only the numeric part
+            patch = Integer.parseInt(patchStr);
+        }
+
+        return major < 4 || (major == 4 && minor == 0 && patch < 12);
     }
 
     @Override
@@ -62,16 +82,4 @@ public final class Main extends JavaPlugin implements Listener
     {
         ProtocolLibrary.getProtocolManager().removePacketListeners(this);
     }
-
-    //TODO: Maybe it's worth adding custom blocks to the vanilla command? since they now will be correctly
-    // resolved by the internal Minecract code.
-    // Idk if it's actually useful.
-//    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-//    private void tab(TabCompleteEvent e)
-//    {
-//        if(e.getBuffer().startsWith("/setblock"))
-//        {
-//
-//        }
-//    }
 }
