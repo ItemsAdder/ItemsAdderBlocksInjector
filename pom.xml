@@ -13,9 +13,10 @@
 
     <groupId>dev.lone</groupId>
     <artifactId>itemsadder-blocks-injector</artifactId>
-    <version>0.0.20</version>
+    <version>0.0.21</version>
     <packaging>pom</packaging>
     <modules>
+        <module>nms_v1_21_8</module>
         <module>nms_v1_21_7</module>
         <module>nms_v1_21_6</module>
         <module>nms_v1_21_5</module>
