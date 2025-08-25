@@ -15,7 +15,6 @@ import dev.lone.itemsadder.api.CustomBlock;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
@@ -25,8 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.plugin.Plugin;
@@ -36,11 +33,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Inspired by https://gist.github.com/MrPowerGamerBR/51bf5beb6466d557da2191ed8a3fe0df
+ * Inspired by <a href="https://gist.github.com/MrPowerGamerBR/51bf5beb6466d557da2191ed8a3fe0df">https://gist.github.com/MrPowerGamerBR/51bf5beb6466d557da2191ed8a3fe0df</a>
  */
 public class v1_21_8 extends AbstractPacketListener
 {
-    ChunkSectionType1_21_5 viaSectionIo = new ChunkSectionType1_21_5(Block.BLOCK_STATE_REGISTRY.size(), BuiltInRegistries.BIOME_SOURCE.size());
+    ChunkSectionType1_21_5 viaSectionIo = new ChunkSectionType1_21_5(Block.BLOCK_STATE_REGISTRY.size(), 0); // For some reason setting it to 0 fixes a bug
 
     public v1_21_8(Plugin plugin)
     {
