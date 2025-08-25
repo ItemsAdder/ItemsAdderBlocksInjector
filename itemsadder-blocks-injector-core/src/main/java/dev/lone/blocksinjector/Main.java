@@ -1,10 +1,9 @@
 package dev.lone.blocksinjector;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.Via;
 import dev.lone.blocksinjector.custom_blocks.nms.blocksmanager.CustomBlocksInjector;
 import dev.lone.blocksinjector.custom_blocks.nms.packetlistener.LegacyDigPacketListener;
-import dev.lone.itemsadder.utils.Msg;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,7 +64,7 @@ public final class Main extends JavaPlugin implements Listener
     {
         Bukkit.getPluginManager().registerEvents(this, this);
 
-        if(ViaVersionPlugin.getInstance().getApi().apiVersion() < 22)
+        if(Via.getAPI().apiVersion() < 22)
         {
             Bukkit.getLogger().severe("Using outdated ViaVersion. Please update to 4.9.3 or greater.");
             Bukkit.getPluginManager().disablePlugin(this); // Is this needed?
@@ -74,7 +73,7 @@ public final class Main extends JavaPlugin implements Listener
         }
 
         if(Bukkit.getPluginManager().isPluginEnabled("LoneLibs"))
-            Msg.warn("LoneLibs is enabled. This plugin is not needed anymore and it's recommended to remove it (if you are not using it for other plugins).");
+            Bukkit.getLogger().warning("LoneLibs is enabled. This plugin is not needed anymore and it's recommended to remove it (if you are not using it for other plugins).");
     }
 
     @Override
