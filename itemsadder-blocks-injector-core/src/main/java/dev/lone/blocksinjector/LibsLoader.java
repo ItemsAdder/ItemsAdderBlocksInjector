@@ -5,7 +5,6 @@ import com.alessiodp.libby.LibraryManager;
 import com.alessiodp.libby.classloader.URLClassLoaderHelper;
 import com.alessiodp.libby.logging.LogLevel;
 import com.alessiodp.libby.logging.adapters.LogAdapter;
-import org.apache.commons.io.FilenameUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -215,7 +214,10 @@ public class LibsLoader extends LibraryManager
         {
             try
             {
-                Path destFilePath = filePath.getParent().resolve(FilenameUtils.getBaseName(filePath.getFileName().toString()) + "-modified.jar");
+                String filename = filePath.getFileName().toString();
+                int dotIndex = filename.lastIndexOf('.');
+                String baseName = (dotIndex == -1) ? filename : filename.substring(0, dotIndex);
+                Path destFilePath = filePath.getParent().resolve(baseName + "-modified.jar");
                 if (!Files.exists(destFilePath))
                     markJarAsToRemap(filePath, destFilePath);
                 filePath = remap(destFilePath);
