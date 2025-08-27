@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "dev.lone"
-version = "0.0.21"
+version = "0.0.22"
 
 allprojects {
     repositories {
