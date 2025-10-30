@@ -45,13 +45,6 @@ public class Nms
         String nmsVersion = getNMSVersion();
         try
         {
-            if (!"v1_21_8".equals(nmsVersion))
-            {
-                if (!Bukkit.getPluginManager().isPluginEnabled("ViaVersion"))
-                {
-                    throw new RuntimeException("This version of Minecraft needs ViaVersion to work properly.");
-                }
-            }
             Class<?> implClass = Class.forName(implClazz.getPackage().getName() + "." + nmsVersion);
             try
             {
