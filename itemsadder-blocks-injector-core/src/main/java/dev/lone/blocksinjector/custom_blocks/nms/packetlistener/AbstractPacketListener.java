@@ -4,8 +4,8 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerOptions;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
-import org.bukkit.plugin.Plugin;
 import dev.lone.blocksinjector.annotations.NotNull;
+import org.bukkit.plugin.Plugin;
 
 public abstract class AbstractPacketListener extends PacketAdapter
 {
