@@ -4,7 +4,7 @@ plugins {
     java
     id("com.gradleup.shadow") version "9.0.2"
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18" apply false
+    alias(libs.plugins.paperweight) apply false
 }
 
 // Depend on all submodules to package their classes into the final jar
@@ -43,6 +43,6 @@ tasks.assemble {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("1.21.10")
     }
 }

@@ -1,12 +1,11 @@
 package dev.lone.blocksinjector.custom_blocks.nms;
 
-import beer.devs.fastnbt.nms.Version;
 import dev.lone.blocksinjector.Main;
-import org.bukkit.Bukkit;
 import dev.lone.blocksinjector.annotations.Nullable;
+import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -43,8 +42,7 @@ public class Nms
     @SuppressWarnings("unchecked")
     public static <T> T findImplementation(Class<T> implClazz, boolean ignoreError, Object ...args)
     {
-        String nmsVersion = Version.get().name();
-
+        String nmsVersion = getNMSVersion();
         try
         {
             Class<?> implClass = Class.forName(implClazz.getPackage().getName() + "." + nmsVersion);
@@ -58,7 +56,7 @@ public class Nms
                 return (T) implClass.getDeclaredConstructor().newInstance();
             }
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
+        catch (Throwable e)
         {
             if (ignoreError)
                 return null;
@@ -70,6 +68,16 @@ public class Nms
             Bukkit.shutdown();
         }
         return null;
+    }
+
+    private static @NotNull String getNMSVersion()
+    {
+        String nmsVersion = Bukkit.getServer().getBukkitVersion().split("-")[0];
+        switch (nmsVersion)
+        {
+            case "1.21.9", "1.21.10" -> nmsVersion = "1.21.8"; // No changes from 1.21.8 to 1.21.10 so we use the same NMS version
+        }
+        return "v" + nmsVersion.replaceAll("\\.", "_");
     }
 
     public enum MethodVisibility
