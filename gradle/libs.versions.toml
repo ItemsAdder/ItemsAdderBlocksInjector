@@ -1,11 +1,9 @@
 [versions]
 paperweight = "2.0.0-beta.19"
-viaversion = "5.5.0-SNAPSHOT"
 protocollib = "5.4.0"
 itemsadder = "4.0.10"
 
 [libraries]
-viaversion = { module = "com.viaversion:viaversion-api", version.ref = "viaversion" }
 protocollib = { module = "net.dmulloy2:ProtocolLib", version.ref = "protocollib" }
 itemsadder = { module = "dev.lone:api-itemsadder", version.ref = "itemsadder" }
 
