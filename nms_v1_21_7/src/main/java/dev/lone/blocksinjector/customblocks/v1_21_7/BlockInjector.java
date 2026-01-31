@@ -1,6 +1,5 @@
 package dev.lone.blocksinjector.customblocks.v1_21_7;
 
-import dev.lone.blocksinjector.NMSCustomBlock;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;

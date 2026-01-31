@@ -1,12 +1,12 @@
-package dev.lone.blocksinjector.customblocks.v1_21_11;
+package dev.lone.blocksinjector.customblocks.v1_21_3;
 
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.bukkit.Material;
@@ -30,12 +30,12 @@ public class BlockInjector implements dev.lone.blocksinjector.customblocks.Block
         Objects.requireNonNull(net.minecraft.world.item.Items.AIR);
         Objects.requireNonNull(CraftMagicNumbers.INSTANCE);
 
-        ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.parse(customBlocKInfo.key()));
+        ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, ResourceLocation.parse(customBlocKInfo.key()));
 
         BlockBehaviour.Properties properties = (switch (customBlocKInfo.type()) {
             case REAL, REAL_NOTE -> BlockBehaviour.Properties.of().strength(0.8f);
             case REAL_TRANSPARENT -> BlockBehaviour.Properties.of().noOcclusion().strength(0.8f);
-            case REAL_WIRE -> BlockBehaviour.Properties.of().noCollision().strength(0.8f);
+            case REAL_WIRE -> BlockBehaviour.Properties.of().noCollission().strength(0.8f);
         }).setId(key);
 
         NMSCustomBlock block = new NMSCustomBlock(properties, customBlocKInfo.id(), Key.key(customBlocKInfo.key()));

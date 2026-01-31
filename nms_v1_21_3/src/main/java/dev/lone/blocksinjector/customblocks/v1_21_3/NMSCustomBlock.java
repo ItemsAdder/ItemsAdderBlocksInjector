@@ -1,4 +1,4 @@
-package dev.lone.blocksinjector;
+package dev.lone.blocksinjector.customblocks.v1_21_3;
 
 import dev.lone.blocksinjector.customblocks.CustomBlock;
 import dev.lone.itemsadder.api.ItemsAdder;

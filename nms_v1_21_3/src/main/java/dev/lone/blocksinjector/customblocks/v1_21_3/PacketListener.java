@@ -1,4 +1,4 @@
-package dev.lone.blocksinjector.customblocks.v1_21_9;
+package dev.lone.blocksinjector.customblocks.v1_21_3;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -19,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -99,7 +99,6 @@ public class PacketListener extends PacketAdapter {
                             new ClientboundLevelParticlesPacket(
                                     new BlockParticleOption(particle.getType(), state),
                                     packet.isOverrideLimiter(),
-                                    packet.alwaysShow(),
                                     packet.getX(),
                                     packet.getY(),
                                     packet.getZ(),
@@ -132,7 +131,7 @@ public class PacketListener extends PacketAdapter {
 
         for (int i = 0; i < sectionCount; i++) {
             //noinspection DataFlowIssue -- It should work fine
-            LevelChunkSection section = new LevelChunkSection(PalettedContainerFactory.create(MinecraftServer.getServer().registryAccess()), null, null, 0);
+            LevelChunkSection section = new LevelChunkSection(MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.BIOME), null, null, 0);
             section.read(oldBuf);
 
             PalettedContainer<BlockState> container = section.getStates();
