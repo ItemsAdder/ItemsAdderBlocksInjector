@@ -1,22 +1,30 @@
 package dev.lone.blocksinjector;
 
 import dev.lone.blocksinjector.customblocks.CustomBlock;
+import dev.lone.itemsadder.api.ItemsAdder;
 import net.kyori.adventure.key.Key;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
 
 public class NMSCustomBlock extends Block implements CustomBlock {
 
-    private final BlockState clientBlockState;
+    private BlockState clientBlockState;
+    private final int itemsAdderId;
     private final Key blockId;
 
-    public NMSCustomBlock(Properties properties, BlockState clientBlockState, Key blockId) {
+    public NMSCustomBlock(Properties properties, int itemsAdderId, Key blockId) {
         super(properties);
-        this.clientBlockState = clientBlockState;
+        this.itemsAdderId = itemsAdderId;
         this.blockId = blockId;
     }
 
     public BlockState clientBlockState() {
+        if (clientBlockState == null) {
+            CraftBlockData blockData = (CraftBlockData) ItemsAdder.Advanced.getBlockDataByInternalId(itemsAdderId);
+            if (blockData == null) throw new RuntimeException("Failed to get block data for " + itemsAdderId);
+            clientBlockState = blockData.getState();
+        }
         return clientBlockState;
     }
 

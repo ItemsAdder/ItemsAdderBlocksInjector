@@ -1,6 +1,7 @@
 package dev.lone.blocksinjector.customblocks.v1_21_11;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -23,7 +24,6 @@ import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,12 +39,14 @@ public class PacketListener extends PacketAdapter {
                         PacketType.Play.Server.MAP_CHUNK,
                         PacketType.Play.Server.BLOCK_CHANGE,
                         PacketType.Play.Server.MULTI_BLOCK_CHANGE,
+                        PacketType.Play.Server.ENTITY_METADATA,
                         PacketType.Play.Server.WORLD_PARTICLES
                 ));
+        ProtocolLibrary.getProtocolManager().addPacketListener(this);
     }
 
     @Override
-    public void onPacketSending(PacketEvent e) {
+    public void onPacketSending(@NotNull PacketEvent e) {
         switch (e.getPacket().getHandle()) {
             case ClientboundBlockUpdatePacket packet -> {
                 Optional<BlockState> newBlockState = getClientBlockState(packet.blockState);
@@ -52,14 +54,18 @@ public class PacketListener extends PacketAdapter {
                 e.setPacket(PacketContainer.fromPacket(new ClientboundBlockUpdatePacket(packet.getPos(), newBlockState.get())));
             }
             case ClientboundSectionBlocksUpdatePacket packet -> {
-                BlockState[] blockStates = e.getPacket().getSpecificModifier(BlockState[].class).read(0);
-                for (int i = 0; i < blockStates.length; i++) {
-                    Optional<BlockState> newBlockState = getClientBlockState(blockStates[i]);
-                    if (newBlockState.isPresent()) {
-                        blockStates[i] = newBlockState.get();
+                try {
+                    BlockState[] blockStates = Reflection.getBlockStates(packet);
+                    for (int i = 0; i < blockStates.length; i++) {
+                        Optional<BlockState> newBlockState = getClientBlockState(blockStates[i]);
+                        if (newBlockState.isPresent()) {
+                            blockStates[i] = newBlockState.get();
+                        }
                     }
+                    Reflection.setBlockStates(packet, blockStates);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
                 }
-                e.getPacket().getSpecificModifier(BlockState[].class).write(0, blockStates);
             }
             case ClientboundLevelChunkWithLightPacket packet -> {
                 ClientboundLevelChunkPacketData chunkData = packet.getChunkData();
@@ -68,9 +74,7 @@ public class PacketListener extends PacketAdapter {
                 int worldMaxHeight = world.getMaxHeight();
                 int worldTrueHeight = (Math.abs(worldMinHeight) + worldMaxHeight);
                 int ySectionCount = worldTrueHeight / 16;
-                byte[] buffer = processChunkPacket(chunkData, ySectionCount);
-                if (buffer != null)
-                    e.getPacket().getSpecificModifier(byte[].class).write(0, buffer);
+                processChunkPacket(chunkData, ySectionCount);
             }
             case ClientboundSetEntityDataPacket(int id, List<SynchedEntityData.DataValue<?>> packedItems) -> {
                 ObjectArrayList<SynchedEntityData.DataValue<?>> newItems = new ObjectArrayList<>(packedItems);
@@ -122,7 +126,7 @@ public class PacketListener extends PacketAdapter {
         return Optional.empty();
     }
 
-    private static byte @Nullable [] processChunkPacket(@NotNull ClientboundLevelChunkPacketData packet, int sectionCount) {
+    private static void processChunkPacket(@NotNull ClientboundLevelChunkPacketData packet, int sectionCount) {
         FriendlyByteBuf oldBuf = new FriendlyByteBuf(packet.getReadBuffer());
         LevelChunkSection[] sections = new LevelChunkSection[sectionCount];
         boolean requiresEdit = false;
@@ -158,9 +162,12 @@ public class PacketListener extends PacketAdapter {
                 //noinspection DataFlowIssue -- actually nullable
                 section.write(newBuf, null, 0);
             }
-            return newBuf.array();
+            try {
+                Reflection.setBuffer(packet, newBuf.array());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
-        return null;
     }
 
 }

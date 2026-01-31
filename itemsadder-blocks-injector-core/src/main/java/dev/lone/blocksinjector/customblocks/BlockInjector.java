@@ -4,12 +4,13 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 public interface BlockInjector {
 
-    void injectBlocks(ObjectArrayList<CustomBlocKInfo> namespacedBlocks) throws Exception;
+    void injectBlock(@NotNull CustomBlocKInfo customBlocKInfo) throws Exception;
 
     default void loadFromCache(ComponentLogger logger) {
         File storageFolder = new File("plugins/ItemsAdder/storage");
@@ -22,7 +23,9 @@ public interface BlockInjector {
             namespacedBlocks.addAll(loadCacheFile(storageFolder, "real_wire_ids_cache", CustomBlocKInfo.Type.REAL_WIRE));
 
             try {
-                injectBlocks(namespacedBlocks);
+                for (CustomBlocKInfo customBlocKInfo : namespacedBlocks) {
+                    injectBlock(customBlocKInfo);
+                }
             } catch (Exception e) {
                 logger.error("Error loading custom blocks from ItemsAdder cache files.", e);
                 System.exit(1);
