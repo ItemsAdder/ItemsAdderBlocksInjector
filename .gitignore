@@ -114,3 +114,6 @@ run/
 
 /output/
 /.paper-nms/
+**/build/*
+**/.gradle/
+

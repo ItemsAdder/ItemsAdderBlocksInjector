@@ -12,7 +12,7 @@ Hack to inject blocks into the game blocks registry and change their texture on 
 - Add compatibility to Iris world generator and similar plugins
 
 ### Notes:
-- Seems FastAsyncWorldEdit breaks because it caches the NMS Block data by iterating the Material class of Bukkit, which doesn't contain the injected custom blocks.
-There is no way to edit enums and push new ones, so this is fixable only by editing FAWE code.
+- if you’re using FastAsyncWorldEdit, make sure to update to version 2.14.0 or newer to avoid this issue.
+FAWE previously had some issues which have been recently fixed. Read more [here](https://github.com/ItemsAdder/ItemsAdderBlocksInjector/issues/1).
 - WorldEdit //undo and //copy won't work with the injected custom blocks, they would be reverted back to NOTE_BLOCK (or mushroom, TRIPWIRE, CHORUS_PLANT)
 - Seems that it's not possible to intercept the tab complete of vanilla commands, so I cannot inject the autocompletion for the custom blocks.
