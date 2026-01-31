@@ -16,5 +16,6 @@ include(
   ":itemsadder-blocks-injector-plugin",
   ":nms_v1_21_11",
   ":nms_v1_21_9",
-  ":nms_v1_21_7"
+  ":nms_v1_21_7",
+  ":nms_v1_21_6"
 )

@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":nms_v1_21_11"))
     implementation(project(":nms_v1_21_9"))
     implementation(project(":nms_v1_21_7"))
+    implementation(project(":nms_v1_21_6"))
 }
 
 tasks.withType<ShadowJar> {
@@ -28,6 +29,6 @@ tasks.assemble {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("1.21.6")
     }
 }
