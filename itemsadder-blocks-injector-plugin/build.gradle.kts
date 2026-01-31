@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":itemsadder-blocks-injector-core"))
     implementation(project(":nms_v1_21_11"))
     implementation(project(":nms_v1_21_9"))
+    implementation(project(":nms_v1_21_7"))
 }
 
 tasks.withType<ShadowJar> {
@@ -27,6 +28,6 @@ tasks.assemble {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.10")
+        minecraftVersion("1.21.8")
     }
 }
