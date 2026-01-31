@@ -11,6 +11,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     implementation(project(":itemsadder-blocks-injector-core"))
     implementation(project(":nms_v1_21_11"))
+    implementation(project(":nms_v1_21_9"))
 }
 
 tasks.withType<ShadowJar> {
@@ -26,6 +27,6 @@ tasks.assemble {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.11")
+        minecraftVersion("1.21.10")
     }
 }
