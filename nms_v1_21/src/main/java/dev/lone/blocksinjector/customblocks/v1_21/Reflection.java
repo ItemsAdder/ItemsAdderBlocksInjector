@@ -9,6 +9,7 @@ import net.minecraft.world.level.chunk.SingleValuePalette;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ public class Reflection {
     private static final Field HASHMAP_PALETTE_VALUES_FIELD;
     private static final Field CRUDE_INCREMENTAL_INT_IDENTITY_HASH_BI_MAP_BYID_FIELD;
     private static final Field SINGLE_VALUE_PALETTE_VALUE_FIELD;
+    private static final Field INTANCE_FIELD;
 
     static {
         try {
@@ -68,7 +70,13 @@ public class Reflection {
             SINGLE_VALUE_PALETTE_VALUE_FIELD = net.minecraft.world.level.chunk.SingleValuePalette.class.getDeclaredField("value");
             SINGLE_VALUE_PALETTE_VALUE_FIELD.setAccessible(true);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize Palette reflection fields", e);
+            throw new RuntimeException("Failed to initialize SINGLE_VALUE_PALETTE_VALUE_FIELD", e);
+        }
+        try {
+            INTANCE_FIELD = CraftMagicNumbers.class.getDeclaredField("INSTANCE");
+            INTANCE_FIELD.setAccessible(true);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize INTANCE_FIELD", e);
         }
     }
 
@@ -85,14 +93,20 @@ public class Reflection {
     }
 
     public static void setBlockMaterial(Block block, Material material) throws Exception {
-        ((Map<Block, Material>) BLOCK_MATERIAL_FIELD.get(null)).put(block, material);
-        ((Map<Material, Block>) MATERIAL_BLOCK_FIELD.get(null)).put(material, block);
+        ((Map<Block, Material>) BLOCK_MATERIAL_FIELD.get(INTANCE_FIELD.get(null))).put(block, material);
+        ((Map<Material, Block>) MATERIAL_BLOCK_FIELD.get(INTANCE_FIELD.get(null))).put(material, block);
     }
 
-    public static @NotNull Object[] getPaletteValues(@NotNull PalettedContainer<?> container) throws Exception {
-        Object data = container.data;
-        Palette<?> palette = (Palette<?>) DATA_PALETTE_FIELD.get(data);
+    public static <T> void setValue(SingleValuePalette<T> palette, T value) throws Exception {
+        SINGLE_VALUE_PALETTE_VALUE_FIELD.set(palette, value);
+    }
 
+    public static <T> Palette<T> getPalette(@NotNull PalettedContainer<T> container) throws Exception {
+        Object data = container.data;
+        return (Palette<T>) DATA_PALETTE_FIELD.get(data);
+    }
+
+    public static Object @Nullable [] getPaletteValues(Palette<?> palette) throws Exception {
         if (palette instanceof net.minecraft.world.level.chunk.LinearPalette<?>) {
             return (Object[]) LINEAR_PALETTE_VALUES_FIELD.get(palette);
         } else if (palette instanceof net.minecraft.world.level.chunk.HashMapPalette<?>) {
@@ -100,22 +114,6 @@ public class Reflection {
         } else if (palette instanceof net.minecraft.world.level.chunk.SingleValuePalette<?>) {
             return new Object[]{SINGLE_VALUE_PALETTE_VALUE_FIELD.get(palette)};
         }
-        throw new IllegalStateException("Unknown palette type: " + palette.getClass());
+        return null;
     }
-
-    public static void setPaletteValues(@NotNull PalettedContainer<?> container, @NotNull Object[] values) throws Exception {
-        Object data = container.data;
-        Palette<?> palette = (Palette<?>) DATA_PALETTE_FIELD.get(data);
-
-        switch (palette) {
-            case SingleValuePalette<?> singleValuePalette ->
-                    SINGLE_VALUE_PALETTE_VALUE_FIELD.set(singleValuePalette, values[0]);
-            case net.minecraft.world.level.chunk.LinearPalette<?> linearPalette ->
-                    LINEAR_PALETTE_VALUES_FIELD.set(linearPalette, values);
-            case net.minecraft.world.level.chunk.HashMapPalette<?> hashMapPalette ->
-                    CRUDE_INCREMENTAL_INT_IDENTITY_HASH_BI_MAP_BYID_FIELD.set(HASHMAP_PALETTE_VALUES_FIELD.get(hashMapPalette), values);
-            default -> throw new IllegalStateException("Unknown palette type: " + palette.getClass());
-        }
-    }
-
 }

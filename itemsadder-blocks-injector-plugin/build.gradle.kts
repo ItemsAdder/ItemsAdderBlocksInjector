@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     java
@@ -34,5 +35,36 @@ tasks.assemble {
 tasks {
     runServer {
         minecraftVersion("1.21.1")
+    }
+}
+
+listOf(
+    "1.21.11",
+    "1.21.10",
+    "1.21.8",
+    "1.21.5",
+    "1.21.4",
+    "1.21.1",
+).forEach {
+    registerPaperTask(it)
+}
+
+fun registerPaperTask(
+    version: String
+) {
+    listOf(version).forEach { taskName ->
+        tasks.register(taskName, RunServer::class) {
+            pluginJars.from(tasks.shadowJar.flatMap { it.archiveFile })
+            pluginJars.from(
+                fileTree("${project.projectDir}/runPaper") {
+                    include("*.jar")
+                }
+            )
+            group = "runPaper"
+            minecraftVersion(version)
+
+            runDirectory = layout.projectDirectory.dir("${project.projectDir}/runPaper/${version.replace("\\.", "")}")
+            systemProperties["com.mojang.eula.agree"] = true
+        }
     }
 }

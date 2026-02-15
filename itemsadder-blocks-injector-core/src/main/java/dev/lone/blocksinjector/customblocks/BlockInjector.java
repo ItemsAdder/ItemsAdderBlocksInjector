@@ -31,8 +31,7 @@ public interface BlockInjector {
                 System.exit(1);
             }
         } else {
-            logger.error("No ItemsAdder/storage folder found.");
-            System.exit(1);
+            logger.error("No ItemsAdder/storage folder found. ItemsAdderBlocksInjector won't do anything.");
         }
     }
 

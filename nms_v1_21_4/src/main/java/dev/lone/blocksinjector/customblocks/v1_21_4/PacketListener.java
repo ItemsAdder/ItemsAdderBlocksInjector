@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.SingleValuePalette;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,11 @@ public class PacketListener extends PacketAdapter {
                 int worldMaxHeight = world.getMaxHeight();
                 int worldTrueHeight = (Math.abs(worldMinHeight) + worldMaxHeight);
                 int ySectionCount = worldTrueHeight / 16;
-                processChunkPacket(chunkData, ySectionCount);
+                try {
+                    processChunkPacket(chunkData, ySectionCount);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
             case ClientboundSetEntityDataPacket(int id, List<SynchedEntityData.DataValue<?>> packedItems) -> {
                 ObjectArrayList<SynchedEntityData.DataValue<?>> newItems = new ObjectArrayList<>(packedItems);
@@ -125,7 +130,7 @@ public class PacketListener extends PacketAdapter {
         return Optional.empty();
     }
 
-    private static void processChunkPacket(@NotNull ClientboundLevelChunkPacketData packet, int sectionCount) {
+    private static void processChunkPacket(@NotNull ClientboundLevelChunkPacketData packet, int sectionCount) throws Exception {
         FriendlyByteBuf oldBuf = new FriendlyByteBuf(packet.getReadBuffer());
         LevelChunkSection[] sections = new LevelChunkSection[sectionCount];
         boolean requiresEdit = false;
@@ -141,13 +146,37 @@ public class PacketListener extends PacketAdapter {
             Palette<BlockState> palette = container.data.palette();
             Object[] values = palette.moonrise$getRawPalette(null);
 
-            for (int j = 0; j < values.length; j++) {
-                Object obj = values[j];
-                if (obj instanceof BlockState state) {
-                    Optional<BlockState> clientBlockState = getClientBlockState(state);
-                    if (clientBlockState.isPresent()) {
-                        values[j] = clientBlockState.get();
+            if (values == null) {
+                for (int x = 0; x < 16; x++) {
+                    for (int y = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            BlockState blockState = section.getBlockState(x, y, z);
+                            Optional<BlockState> clientBlockState = getClientBlockState(blockState);
+                            if (clientBlockState.isPresent()) {
+                                section.setBlockState(x, y, z, clientBlockState.get());
+                                requiresEdit = true;
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (palette instanceof SingleValuePalette<BlockState> singleValuePalette) {
+                    Optional<BlockState> blockState = getClientBlockState((BlockState) values[0]);
+                    if (blockState.isPresent()) {
+                        values[0] = blockState.get();
+                        Reflection.setValue(singleValuePalette, blockState.get());
                         requiresEdit = true;
+                    }
+                } else {
+                    for (int j = 0; j < values.length; j++) {
+                        Object obj = values[j];
+                        if (obj instanceof BlockState state) {
+                            Optional<BlockState> clientBlockState = getClientBlockState(state);
+                            if (clientBlockState.isPresent()) {
+                                values[j] = clientBlockState.get();
+                                requiresEdit = true;
+                            }
+                        }
                     }
                 }
             }
