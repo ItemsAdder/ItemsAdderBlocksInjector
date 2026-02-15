@@ -1,4 +1,4 @@
-package dev.lone.blocksinjector.customblocks.v1_21_3;
+package dev.lone.blocksinjector.customblocks.v1_20_6;
 
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.MappedRegistry;
@@ -28,15 +28,16 @@ public class BlockInjector implements dev.lone.blocksinjector.customblocks.Block
         // Make sure MC classes are loaded
         Objects.requireNonNull(net.minecraft.world.level.block.Blocks.AIR);
         Objects.requireNonNull(net.minecraft.world.item.Items.AIR);
-        Objects.requireNonNull(CraftMagicNumbers.INSTANCE);
+        Objects.requireNonNull(CraftMagicNumbers.getBlock(Material.AIR));
 
-        ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, ResourceLocation.parse(customBlocKInfo.key()));
+        ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, new ResourceLocation(customBlocKInfo.key()));
+
 
         BlockBehaviour.Properties properties = (switch (customBlocKInfo.type()) {
             case REAL, REAL_NOTE -> BlockBehaviour.Properties.of().strength(0.8f);
             case REAL_TRANSPARENT -> BlockBehaviour.Properties.of().noOcclusion().strength(0.8f);
             case REAL_WIRE -> BlockBehaviour.Properties.of().noCollission().strength(0.8f);
-        }).setId(key);
+        });
 
         NMSCustomBlock block = new NMSCustomBlock(properties, customBlocKInfo.id(), Key.key(customBlocKInfo.key()));
 
@@ -50,6 +51,7 @@ public class BlockInjector implements dev.lone.blocksinjector.customblocks.Block
             case REAL, REAL_NOTE, REAL_TRANSPARENT -> Material.COBBLESTONE;
             case REAL_WIRE -> Material.TRIPWIRE;
         });
+
         BLOCKS.add(block);
     }
 

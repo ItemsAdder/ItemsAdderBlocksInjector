@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":nms_v1_21_4"))
     implementation(project(":nms_v1_21_3"))
     implementation(project(":nms_v1_21"))
+    implementation(project(":nms_v1_20_6"))
 }
 
 tasks.withType<ShadowJar> {
@@ -45,6 +46,7 @@ listOf(
     "1.21.5",
     "1.21.4",
     "1.21.1",
+    "1.20.6"
 ).forEach {
     registerPaperTask(it)
 }

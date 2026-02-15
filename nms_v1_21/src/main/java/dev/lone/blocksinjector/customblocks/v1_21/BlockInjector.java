@@ -51,6 +51,7 @@ public class BlockInjector implements dev.lone.blocksinjector.customblocks.Block
             case REAL, REAL_NOTE, REAL_TRANSPARENT -> Material.COBBLESTONE;
             case REAL_WIRE -> Material.TRIPWIRE;
         });
+        BLOCKS.add(block);
     }
 
 }

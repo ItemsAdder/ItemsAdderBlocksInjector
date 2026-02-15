@@ -7,10 +7,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.List;
 
 public interface BlockInjector {
 
     void injectBlock(@NotNull CustomBlocKInfo customBlocKInfo) throws Exception;
+
+    List<CustomBlock> BLOCKS = new ObjectArrayList<>();
 
     default void loadFromCache(ComponentLogger logger) {
         File storageFolder = new File("plugins/ItemsAdder/storage");

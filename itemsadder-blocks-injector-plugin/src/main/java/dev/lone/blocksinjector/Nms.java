@@ -16,6 +16,7 @@ public class Nms {
             case "1.21.3" -> new dev.lone.blocksinjector.customblocks.v1_21_3.BlockInjector();
             // Paper 1.21.2 isn't downloadable
             case "1.21", "1.21.1" -> new dev.lone.blocksinjector.customblocks.v1_21.BlockInjector();
+            case "1.20.5", "1.20.6" -> new dev.lone.blocksinjector.customblocks.v1_20_6.BlockInjector();
             default -> throw new IllegalArgumentException("Unsupported version: " + version);
         };
     }
@@ -31,6 +32,7 @@ public class Nms {
             case "1.21.3" -> new dev.lone.blocksinjector.customblocks.v1_21_3.PacketListener(plugin);
             // Paper 1.21.2 isn't downloadable
             case "1.21", "1.21.1" -> new dev.lone.blocksinjector.customblocks.v1_21.PacketListener(plugin);
+            case "1.20.5", "1.20.6" -> new dev.lone.blocksinjector.customblocks.v1_20_6.PacketListener(plugin);
             default -> throw new IllegalArgumentException("Unsupported version: " + version);
         }
     }
