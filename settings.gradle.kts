@@ -13,19 +13,14 @@ rootProject.name = "ItemsAdderBlocksInjector"
 
 include(
   ":itemsadder-blocks-injector-core",
-  ":itemsadder-blocks-injector-jar",
-  ":nms_v1_18_R2",
-  ":nms_v1_19_R1",
-  ":nms_v1_19_R2",
-  ":nms_v1_19_R3",
-  ":nms_v1_20_R1",
-  ":nms_v1_20_R2",
-  ":nms_v1_20_R3",
-  ":nms_v1_20_6",
-  ":nms_v1_21_1",
-  ":nms_v1_21_4",
-  ":nms_v1_21_5",
-  ":nms_v1_21_6",
+  ":itemsadder-blocks-injector-plugin",
+  ":nms_v1_21_11",
+  ":nms_v1_21_9",
   ":nms_v1_21_7",
-  ":nms_v1_21_8"
+  ":nms_v1_21_6",
+  ":nms_v1_21_5",
+  ":nms_v1_21_4",
+  ":nms_v1_21_3",
+  ":nms_v1_21",
+  ":nms_v1_20_6"
 )

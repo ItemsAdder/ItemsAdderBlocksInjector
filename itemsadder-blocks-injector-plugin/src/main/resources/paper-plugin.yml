@@ -1,0 +1,21 @@
+name: ItemsAdderBlocksInjector
+version: 0.0.22
+main: dev.lone.blocksinjector.Main
+api-version: '1.20.6'
+authors: [Thomas (misieur)]
+website: https://misieur.me/
+bootstrapper: dev.lone.blocksinjector.Bootstrap
+dependencies:
+  server:
+    Iris:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    ItemsAdder:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    ProtocolLib:
+      load: BEFORE
+      required: true
+      join-classpath: true

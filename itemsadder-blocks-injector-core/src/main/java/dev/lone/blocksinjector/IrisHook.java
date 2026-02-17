@@ -1,17 +1,24 @@
 package dev.lone.blocksinjector;
 
-import com.volmit.iris.util.data.B;
-import dev.lone.blocksinjector.custom_blocks.CachedCustomBlockInfo;
+import dev.lone.blocksinjector.customblocks.BlockInjector;
+import dev.lone.blocksinjector.customblocks.CustomBlock;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+public class IrisHook {
 
-public class IrisHook
-{
-    public static void inject(HashMap<CachedCustomBlockInfo, Integer> customBlocks)
-    {
-        customBlocks.forEach((cached, integer) -> {
-            B.registerCustomBlockData(cached.namespace, cached.key, Bukkit.createBlockData(cached.namespace + ":" + cached.key));
-        });
+    public static void injectFromBlockInjector() {
+        for (CustomBlock customBlock: BlockInjector.BLOCKS) {
+            System.out.println("Injecting block " + customBlock.blockId() + " to Iris");
+            inject(customBlock);
+        }
+    }
+
+    public static void inject(@NotNull CustomBlock customBlock) {
+        com.volmit.iris.util.data.B.registerCustomBlockData(
+                customBlock.blockId().namespace(),
+                customBlock.blockId().value(),
+                Bukkit.createBlockData(customBlock.blockId().asString())
+        );
     }
 }
